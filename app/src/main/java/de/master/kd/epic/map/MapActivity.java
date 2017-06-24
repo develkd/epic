@@ -1,9 +1,7 @@
 package de.master.kd.epic.map;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
@@ -12,7 +10,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
 
@@ -31,18 +28,21 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import de.master.kd.epic.R;
 import de.master.kd.epic.position.PositionEditActivity;
+import de.master.kd.epic.utils.Constants;
 
-public class MapActivity  extends FragmentActivity implements OnMapReadyCallback,
+public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
 
     private GoogleMap googleMap;
-    private GoogleApiClient mGoogleApiClient;
-    private Location mLastLocation;
+    private GoogleApiClient googleApiClient;
+    private Location lastLocation;
     //private Marker mCurrLocationMarker;
-    private LocationRequest mLocationRequest;
+    private LocationRequest locationRequest;
     private LatLng location;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +56,6 @@ public class MapActivity  extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.select_point);
@@ -103,46 +102,46 @@ public class MapActivity  extends FragmentActivity implements OnMapReadyCallback
                 buildGoogleApiClient();
                 googleMap.setMyLocationEnabled(true);
             }
-        }
-        else {
+        } else {
             buildGoogleApiClient();
             googleMap.setMyLocationEnabled(true);
         }
     }
 
     protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
+        googleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
-        mGoogleApiClient.connect();
+        googleApiClient.connect();
     }
 
     @Override
     public void onConnected(Bundle bundle) {
 
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(1000);
-        mLocationRequest.setFastestInterval(1000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        locationRequest = new LocationRequest();
+        locationRequest.setInterval(1000);
+        locationRequest.setFastestInterval(1000);
+        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient,mLocationRequest,this);
+            LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
         }
 
     }
 
     @Override
     public void onConnectionSuspended(int i) {
+        System.out.print("AUTSCH");
 
     }
 
     @Override
     public void onLocationChanged(Location location) {
 
-        mLastLocation = location;
+        lastLocation = location;
         /*
         if (mCurrLocationMarker != null) {
             mCurrLocationMarker.remove();
@@ -162,21 +161,21 @@ public class MapActivity  extends FragmentActivity implements OnMapReadyCallback
         googleMap.animateCamera(CameraUpdateFactory.zoomTo(11));
 
         //stop location updates
-        if (mGoogleApiClient != null) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+        if (googleApiClient != null) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
         }
 
     }
 
 
-
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-
+        System.out.print("AUTSCH");
     }
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
-    public boolean checkLocationPermission(){
+
+    public boolean checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -202,9 +201,9 @@ public class MapActivity  extends FragmentActivity implements OnMapReadyCallback
                         MY_PERMISSIONS_REQUEST_LOCATION);
             }
             return false;
-        } else {
-            return true;
         }
+        return true;
+
     }
 
     @Override
@@ -222,7 +221,7 @@ public class MapActivity  extends FragmentActivity implements OnMapReadyCallback
                             Manifest.permission.ACCESS_FINE_LOCATION)
                             == PackageManager.PERMISSION_GRANTED) {
 
-                        if (mGoogleApiClient == null) {
+                        if (googleApiClient == null) {
                             buildGoogleApiClient();
                         }
                         googleMap.setMyLocationEnabled(true);
@@ -242,19 +241,33 @@ public class MapActivity  extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    public void markPosition(View view){
+    public void markPosition(View view) {
+        location = new LatLng(-34, 151);
         Intent position = new Intent(MapActivity.this, PositionEditActivity.class);
+
+         position.putExtra(Constants.MAP.CURRENT_LOCATION.name(), location );
+
         startActivity(position);
         finish();
+
+
         //https://www.androidtutorialpoint.com/intermediate/android-map-app-showing-current-location-android/
-        Marker marker =  googleMap.addMarker(new MarkerOptions()
+        Marker marker = googleMap.addMarker(new MarkerOptions()
                 .position(location)
                 .title("Neue Position")
                 .snippet(location.toString()));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(location));
         marker.showInfoWindow();
-
     }
 
+    public void share(){
+//        Intent sendIntent = new Intent();
+//        sendIntent.setAction(Intent.ACTION_SEND);
+//        sendIntent.putExtra(Intent.EXTRA_SUBJECT,"[contenttagger] " + this.note.getTitle());
+//        sendIntent.putExtra(Intent.EXTRA_TEXT, this.note.getContent() + "\n\n [sent from contenttagger@android]");
+//        sendIntent.setType("text/plain");
+//        startActivity(sendIntent);
+    }
 
 }
 

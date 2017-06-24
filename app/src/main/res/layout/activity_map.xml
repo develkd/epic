@@ -17,16 +17,16 @@ android:orientation="vertical">
         tools:context="de.master.kd.epic.map.MapActivity" />
 
 
-<android.support.design.widget.FloatingActionButton
-    android:id="@+id/select_point"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_gravity="bottom|center"
-    android:layout_margin="@dimen/item_edit_margin"
-    android:clickable="true"
-    app:backgroundTint="@color/colorPrimary"
-    app:elevation="0dp"
-    app:rippleColor="@android:drawable/screen_background_light_transparent"
-    app:srcCompat="@drawable/ic_action_point" />
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/select_point"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_margin="@dimen/item_edit_margin"
+        android:clickable="true"
+        android:onClick="markPosition"
+        app:backgroundTint="@color/colorPrimary"
+        app:rippleColor="@android:drawable/screen_background_light_transparent"
+        app:srcCompat="@drawable/ic_action_point" />
 
 </android.support.design.widget.CoordinatorLayout>
