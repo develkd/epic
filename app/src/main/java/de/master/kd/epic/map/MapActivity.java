@@ -245,16 +245,24 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         location = new LatLng(-34, 151);
         Intent position = new Intent(MapActivity.this, PositionEditActivity.class);
 
-         position.putExtra(Constants.MAP.CURRENT_LOCATION.name(), location );
+         position.putExtra(Constants.MAP.LOCATION.name(), location );
+        startActivityForResult(position,Constants.MAP.ACTIVITY_RESULT.ordinal());
 
-        startActivity(position);
-        finish();
 
 
         //https://www.androidtutorialpoint.com/intermediate/android-map-app-showing-current-location-android/
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Bundle bundle = data.getExtras();
+        String titel = (String)bundle.get(Constants.MAP.DESCRIPTION.name());
+
         Marker marker = googleMap.addMarker(new MarkerOptions()
                 .position(location)
-                .title("Neue Position")
+                .title(titel)
                 .snippet(location.toString()));
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(location));
         marker.showInfoWindow();
