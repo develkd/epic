@@ -17,15 +17,15 @@ public class PositionService {
     }
 
 
-    public static Position buildPositionWith(String title, String description, LatLng latLng, Long mapId, Long picId){
+    public static Position buildPositionWith(String title, String description, LatLng latLng,Long picId, Long mapId){
         Position position = new Position();
         position.setId(new Date().getTime());
         position.setTitle(title);
         position.setDescription(description);
         position.setLatitude(latLng.latitude);
         position.setLongitude(latLng.longitude);
-        position.setRefIdMap(mapId);
         position.setRefIdPicture(picId);
+        position.setRefIdMap(mapId);
         new PostionsCRUDController().save(position);
         return position;
     }
