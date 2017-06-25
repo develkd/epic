@@ -4,6 +4,7 @@ apply plugin: 'org.greenrobot.greendao' // apply plugin
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
+
     defaultConfig {
         applicationId "de.master.kd.epic"
         minSdkVersion 16
@@ -18,6 +19,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    dataBinding {
+        enabled = true
+    }
+
+
 }
 
 
@@ -37,4 +43,5 @@ dependencies {
     // This is only needed if you want to use encrypted databases
     compile 'net.zetetic:android-database-sqlcipher:3.5.6'
     testCompile 'junit:junit:4.12'
+    compile 'javax.annotation:javax.annotation-api:1.2'
 }

@@ -27,8 +27,10 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import de.master.kd.epic.R;
+import de.master.kd.epic.domain.Position;
 import de.master.kd.epic.position.PositionEditActivity;
 import de.master.kd.epic.utils.Constants;
+import de.master.kd.epic.utils.StringUtils;
 
 public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
@@ -246,7 +248,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         Intent position = new Intent(MapActivity.this, PositionEditActivity.class);
 
          position.putExtra(Constants.MAP.LOCATION.name(), location );
-        startActivityForResult(position,Constants.MAP.ACTIVITY_RESULT.ordinal());
+        startActivityForResult(position,Constants.RESULT.MAP.ordinal());
 
 
 
@@ -258,12 +260,12 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Bundle bundle = data.getExtras();
-        String titel = (String)bundle.get(Constants.MAP.DESCRIPTION.name());
+        Position position = (Position) bundle.get(Constants.MAP.POSITION.name());
 
         Marker marker = googleMap.addMarker(new MarkerOptions()
                 .position(location)
-                .title(titel)
-                .snippet(location.toString()));
+                .title(position.getTitle())
+                .snippet(StringUtils.cut(position.getDescription(), 10)));
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(location));
         marker.showInfoWindow();
     }

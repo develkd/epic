@@ -13,11 +13,13 @@ import android.widget.ImageView;
 import com.google.android.gms.maps.model.LatLng;
 
 import de.master.kd.epic.R;
+import de.master.kd.epic.domain.Position;
+import de.master.kd.epic.interfaces.PositionService;
 import de.master.kd.epic.map.MapActivity;
 import de.master.kd.epic.utils.Constants;
 
 public class PositionEditActivity extends AppCompatActivity {
-    private static final int TAKE_PICTURE =1;
+
 
     private ImageView imageView;
     private FloatingActionButton postionSave;
@@ -41,22 +43,21 @@ public class PositionEditActivity extends AppCompatActivity {
             }
         });
 
-        Bundle bundle = getIntent().getExtras();
-        LatLng position = (LatLng)bundle.get(Constants.MAP.LOCATION.name());
+
     }
 
     private void doSave(View v) {
-        EditText text = (EditText)findViewById(R.id.titleField);
+        Position p = callPersistPositionService();
         Intent intent = new Intent(PositionEditActivity.this, MapActivity.class);
 
-       intent.putExtra(Constants.MAP.DESCRIPTION.name(),String.valueOf(text.getText()));
-        setResult(Constants.MAP.ACTIVITY_RESULT.ordinal(), intent);
+       intent.putExtra(Constants.MAP.POSITION.name(),p);
+        setResult(Constants.RESULT.MAP.ordinal(), intent);
         finish();
     }
 
     public void doSnapShot(View view){
         Intent intent_picture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(intent_picture,TAKE_PICTURE);
+        startActivityForResult(intent_picture,Constants.RESULT.CAMERA.ordinal());
     }
 
     @Override
@@ -66,5 +67,16 @@ public class PositionEditActivity extends AppCompatActivity {
         Bitmap bitmap = (Bitmap)extras.get("data");
         assert  null != bitmap;
         imageView.setImageBitmap(bitmap);
+    }
+
+
+    private Position callPersistPositionService(){
+        EditText text = (EditText)findViewById(R.id.titleField);
+        EditText describe = (EditText)findViewById(R.id.describeField);
+        Bundle bundle = getIntent().getExtras();
+        LatLng latLng = (LatLng)bundle.get(Constants.MAP.LOCATION.name());
+
+        return PositionService.buildPositionWith(String.valueOf(text.getText()), String.valueOf(describe.getText()), latLng,Long.valueOf(imageView.getId()),null);
+
     }
 }

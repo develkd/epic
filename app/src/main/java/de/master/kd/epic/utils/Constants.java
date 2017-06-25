@@ -8,10 +8,16 @@ import android.util.EventLogTags;
 
 public interface Constants {
     public enum MAP {
+        POSITION,
         LOCATION,
         DESCRIPTION,
-        ACTIVITY_RESULT,
         ;
     }
 
+    public enum RESULT{
+        MAP,
+        CAMERA,
+
+        ;
+    }
 }

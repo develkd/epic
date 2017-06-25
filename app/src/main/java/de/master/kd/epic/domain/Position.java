@@ -1,5 +1,7 @@
 package de.master.kd.epic.domain;
 
+import android.databinding.BaseObservable;
+import android.databinding.Bindable;
 import android.support.annotation.Nullable;
 
 import org.greenrobot.greendao.annotation.Entity;
@@ -9,29 +11,34 @@ import org.greenrobot.greendao.annotation.NotNull;
 
 import java.io.Serializable;
 import java.util.Date;
+import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.annotation.Transient;
+
 /**
  * Created by pentax on 25.06.17.
  */
 
 @Entity(indexes = {
-        @Index(value = "title, date DESC")
+        @Index(value = "title, createDate DESC")
 })
-
-public class Position implements  Serializable {
+public class Position extends BaseObservable implements  Serializable {
     private static final long serialVersionUID = 4988199900863565459L;
 
     @Id(autoincrement = true)
     private Long id;
+    
     @NotNull
+    @Bindable
     private String title;
 
+    @Bindable
     private String description;
 
     @NotNull
-    private Long latitude;
+    private Double latitude;
 
     @NotNull
-    private Long longitude;
+    private Double longitude;
 
     private Long refIdMap;
 
@@ -41,6 +48,25 @@ public class Position implements  Serializable {
     private Date createDate;
 
     private Date updateDate;
+
+    @Generated(hash = 943199282)
+    public Position(Long id, @NotNull String title, String description, @NotNull Double latitude,
+            @NotNull Double longitude, Long refIdMap, Long refIdPicture, @NotNull Date createDate,
+            Date updateDate) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.refIdMap = refIdMap;
+        this.refIdPicture = refIdPicture;
+        this.createDate = createDate;
+        this.updateDate = updateDate;
+    }
+
+    @Generated(hash = 958937587)
+    public Position() {
+    }
 
     public Long getId() {
         return id;
@@ -66,19 +92,19 @@ public class Position implements  Serializable {
         this.description = description;
     }
 
-    public Long getLatitude() {
+    public Double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(@NotNull Long latitude) {
+    public void setLatitude(@NotNull Double latitude) {
         this.latitude = latitude;
     }
 
-    public Long getLongitude() {
+    public Double getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(@NotNull Long longitude) {
+    public void setLongitude(@NotNull Double longitude) {
         this.longitude = longitude;
     }
 
@@ -102,6 +128,7 @@ public class Position implements  Serializable {
         return createDate;
     }
 
+
     public void setCreateDate(@NotNull Date createDate) {
         this.createDate = createDate;
     }
@@ -114,6 +141,11 @@ public class Position implements  Serializable {
         this.updateDate = updateDate;
     }
 
+
+    @javax.annotation.PostConstruct
+    private void setCreationTime(){
+        setCreateDate(new Date());
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -165,4 +197,6 @@ public class Position implements  Serializable {
         sb.append('}');
         return sb.toString();
     }
+
+
 }
