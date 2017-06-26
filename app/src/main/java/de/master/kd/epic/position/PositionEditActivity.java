@@ -12,6 +12,8 @@ import android.widget.ImageView;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.io.Serializable;
+
 import de.master.kd.epic.R;
 import de.master.kd.epic.domain.Position;
 import de.master.kd.epic.interfaces.PositionService;
@@ -47,10 +49,10 @@ public class PositionEditActivity extends AppCompatActivity {
     }
 
     private void doSave(View v) {
-        Position p = callPersistPositionService();
+       Position p =  callPersistPositionService();
         Intent intent = new Intent(PositionEditActivity.this, MapActivity.class);
 
-       intent.putExtra(Constants.MAP.POSITION.name(),p);
+       intent.putExtra(Constants.MAP.POSITION.name(), p);
         setResult(Constants.RESULT.MAP.ordinal(), intent);
         finish();
     }
@@ -76,7 +78,7 @@ public class PositionEditActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         LatLng latLng = (LatLng)bundle.get(Constants.MAP.LOCATION.name());
 
-        return PositionService.buildPositionWith(String.valueOf(text.getText()), String.valueOf(describe.getText()), latLng,Long.valueOf(imageView.getId()),null);
+       return PositionService.buildPositionWith(String.valueOf(text.getText()), String.valueOf(describe.getText()), latLng,Long.valueOf(imageView.getId()),null);
 
     }
 }

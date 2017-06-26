@@ -12,7 +12,7 @@ import de.master.kd.epic.exceptions.ElementNotFoundException;
  * Created by pentax on 25.06.17.
  */
 
-public class PostionsCRUDController implements PositionCRUD {
+public class PostionsPersistanceService implements PositionCRUD {
 
 //    public static final boolean ENCRYPTED = true;
 //
@@ -31,9 +31,9 @@ public class PostionsCRUDController implements PositionCRUD {
 //        return daoSession;
 //    }
 
-    private List<Position> positions = new ArrayList<>();
+    private ArrayList<Position> positions = new ArrayList<>();
     @Override
-    public List<Position> getAllPositions() {
+    public ArrayList<Position> getAllPositions() {
         return positions;
     }
 

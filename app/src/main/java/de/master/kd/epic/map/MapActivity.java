@@ -7,7 +7,6 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
@@ -28,8 +27,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import de.master.kd.epic.R;
 import de.master.kd.epic.domain.Position;
+import de.master.kd.epic.map.interfaces.LocationService;
 import de.master.kd.epic.position.PositionEditActivity;
 import de.master.kd.epic.utils.Constants;
+import de.master.kd.epic.utils.LatLngHolder;
 import de.master.kd.epic.utils.StringUtils;
 
 public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
@@ -39,22 +40,17 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
     private GoogleMap googleMap;
     private GoogleApiClient googleApiClient;
-    private Location lastLocation;
-    //private Marker mCurrLocationMarker;
     private LocationRequest locationRequest;
     private LatLng location;
-
-
+    private LatLngHolder dummyHolder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+        checkGpsStatus();
 
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            checkLocationPermission();
-        }
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+          // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -70,6 +66,19 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
     }
 
+    private void checkGpsStatus(){
+        LocationService locationService = new LocationService();
+        if(locationService.isGpsEnabled(this)){
+            Toast.makeText(this, "GPS not present. Use dummy locations", Toast.LENGTH_LONG).show();
+            dummyHolder = new LatLngHolder();
+        }
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if( locationService.checkLocationPermission(this)){
+                Toast.makeText(this, "No permission for GPS found", Toast.LENGTH_LONG).show();
+            }
+        }
+
+    }
 
     /**
      * Manipulates the map once available.
@@ -90,11 +99,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 return false;
             }
         });
-        /*
-        location = new LatLng(-34, 151);
-        googleMap.addMarker(new MarkerOptions().position(location).title("Marker in Sydney"));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(location));
-        */
+
 
         //Initialize Google Play Services
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -142,22 +147,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
     @Override
     public void onLocationChanged(Location location) {
-
-        lastLocation = location;
-        /*
-        if (mCurrLocationMarker != null) {
-            mCurrLocationMarker.remove();
-        }
-        */
-
         //Place current location marker
         this.location = new LatLng(location.getLatitude(), location.getLongitude());
-//        MarkerOptions markerOptions = new MarkerOptions();
-//        markerOptions.position(location);
-//        markerOptions.title(sharedPref.getString("markerText",""));
-        //markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-        //      mCurrLocationMarker = googleMap.addMarker(markerOptions);
-
         //move map camera
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(this.location));
         googleMap.animateCamera(CameraUpdateFactory.zoomTo(11));
@@ -175,44 +166,13 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         System.out.print("AUTSCH");
     }
 
-    public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
 
-    public boolean checkLocationPermission() {
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            // Asking user if explanation is needed
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.ACCESS_FINE_LOCATION)) {
-
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-
-                //Prompt the user once explanation has been shown
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        MY_PERMISSIONS_REQUEST_LOCATION);
-
-
-            } else {
-                // No explanation needed, we can request the permission.
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        MY_PERMISSIONS_REQUEST_LOCATION);
-            }
-            return false;
-        }
-        return true;
-
-    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
         switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_LOCATION: {
+            case LocationService.EPIC_LOCATION_PERMISSIONS_REQUEST: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -244,7 +204,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
 
     public void markPosition(View view) {
-        location = new LatLng(-34, 151);
+        if(null != dummyHolder) {
+            location = dummyHolder.next();
+        }
         Intent position = new Intent(MapActivity.this, PositionEditActivity.class);
 
          position.putExtra(Constants.MAP.LOCATION.name(), location );
@@ -260,14 +222,19 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Bundle bundle = data.getExtras();
-        Position position = (Position) bundle.get(Constants.MAP.POSITION.name());
 
-        Marker marker = googleMap.addMarker(new MarkerOptions()
-                .position(location)
-                .title(position.getTitle())
-                .snippet(StringUtils.cut(position.getDescription(), 10)));
+        Position p = (Position)bundle.get(Constants.MAP.POSITION.name());
+
+            Marker marker = googleMap.addMarker(new MarkerOptions()
+                    .position(location)
+                    .title(p.getTitle())
+                    .snippet(StringUtils.cut(p.getDescription(), 10)));
+            marker.setDraggable(false);
+            marker.showInfoWindow();
+
+
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(location));
-        marker.showInfoWindow();
+
     }
 
     public void share(){
@@ -278,6 +245,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 //        sendIntent.setType("text/plain");
 //        startActivity(sendIntent);
     }
+
+
 
 }
 
