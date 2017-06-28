@@ -20,7 +20,15 @@ public class Converter {
         return dateFormat.format(date);
     }
 
-    public static Date toObject(String date) throws ParseException{
+    public static Date toDate(String date) throws ParseException{
             return dateFormat.parse(date);
+    }
+
+    public static final String toString(Double value){
+        return Double.toString(value);
+    }
+
+    public static final Double toDouble(String value){
+        return Double.parseDouble(value);
     }
 }

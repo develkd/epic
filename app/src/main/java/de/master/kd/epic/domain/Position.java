@@ -2,71 +2,57 @@ package de.master.kd.epic.domain;
 
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
-import android.support.annotation.Nullable;
-
-import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Id;
-import org.greenrobot.greendao.annotation.Index;
-import org.greenrobot.greendao.annotation.NotNull;
+import android.provider.BaseColumns;
 
 import java.io.Serializable;
 import java.util.Date;
-import org.greenrobot.greendao.annotation.Generated;
-import org.greenrobot.greendao.annotation.Transient;
 
 /**
  * Created by pentax on 25.06.17.
  */
-
-@Entity(indexes = {
-        @Index(value = "title, createDate DESC")
-})
-public class Position extends BaseObservable implements  Serializable {
+public class Position extends BaseObservable implements BaseColumns, Serializable {
     private static final long serialVersionUID = 4988199900863565459L;
 
-    @Id(autoincrement = true)
+
     private Long id;
-    
-    @NotNull
+
     @Bindable
     private String title;
 
     @Bindable
     private String description;
 
-    @NotNull
     private Double latitude;
 
-    @NotNull
     private Double longitude;
 
-    private Long refIdMap;
+    private String pathMap;
 
-    private Long refIdPicture;
+    private String pathPicture;
 
-    @NotNull
     private Date createDate;
 
     private Date updateDate;
 
-    @Generated(hash = 943199282)
-    public Position(Long id, @NotNull String title, String description, @NotNull Double latitude,
-            @NotNull Double longitude, Long refIdMap, Long refIdPicture, @NotNull Date createDate,
-            Date updateDate) {
+
+    public Position(Long id, String title, String description, Double latitude,
+                    Double longitude, String pathMap, String pathPicture, Date createDate,
+                    Date updateDate) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.refIdMap = refIdMap;
-        this.refIdPicture = refIdPicture;
+        this.pathMap = pathMap;
+        this.pathPicture = pathPicture;
         this.createDate = createDate;
         this.updateDate = updateDate;
     }
 
-    @Generated(hash = 958937587)
+
     public Position() {
     }
+
 
     public Long getId() {
         return id;
@@ -80,7 +66,7 @@ public class Position extends BaseObservable implements  Serializable {
         return title;
     }
 
-    public void setTitle(@NotNull String title) {
+    public void setTitle(String title) {
         this.title = title;
     }
 
@@ -96,7 +82,7 @@ public class Position extends BaseObservable implements  Serializable {
         return latitude;
     }
 
-    public void setLatitude(@NotNull Double latitude) {
+    public void setLatitude(Double latitude) {
         this.latitude = latitude;
     }
 
@@ -104,24 +90,24 @@ public class Position extends BaseObservable implements  Serializable {
         return longitude;
     }
 
-    public void setLongitude(@NotNull Double longitude) {
+    public void setLongitude(Double longitude) {
         this.longitude = longitude;
     }
 
-    public Long getRefIdMap() {
-        return refIdMap;
+    public String getPathMap() {
+        return pathMap;
     }
 
-    public void setRefIdMap(Long refIdMap) {
-        this.refIdMap = refIdMap;
+    public void setPathMap(String pathMap) {
+        this.pathMap = pathMap;
     }
 
-    public Long getRefIdPicture() {
-        return refIdPicture;
+    public String getPathPicture() {
+        return pathPicture;
     }
 
-    public void setRefIdPicture(Long refIdPicture) {
-        this.refIdPicture = refIdPicture;
+    public void setPathPicture(String pathPicture) {
+        this.pathPicture = pathPicture;
     }
 
     public Date getCreateDate() {
@@ -129,7 +115,7 @@ public class Position extends BaseObservable implements  Serializable {
     }
 
 
-    public void setCreateDate(@NotNull Date createDate) {
+    public void setCreateDate(Date createDate) {
         this.createDate = createDate;
     }
 
@@ -143,9 +129,10 @@ public class Position extends BaseObservable implements  Serializable {
 
 
     @javax.annotation.PostConstruct
-    private void setCreationTime(){
+    private void setCreationTime() {
         setCreateDate(new Date());
     }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -155,16 +142,9 @@ public class Position extends BaseObservable implements  Serializable {
 
         if (!id.equals(position.id)) return false;
         if (!title.equals(position.title)) return false;
-        if (description != null ? !description.equals(position.description) : position.description != null)
-            return false;
         if (!latitude.equals(position.latitude)) return false;
         if (!longitude.equals(position.longitude)) return false;
-        if (refIdMap != null ? !refIdMap.equals(position.refIdMap) : position.refIdMap != null)
-            return false;
-        if (refIdPicture != null ? !refIdPicture.equals(position.refIdPicture) : position.refIdPicture != null)
-            return false;
-        if (!createDate.equals(position.createDate)) return false;
-        return updateDate != null ? updateDate.equals(position.updateDate) : position.updateDate == null;
+        return createDate.equals(position.createDate);
 
     }
 
@@ -172,15 +152,12 @@ public class Position extends BaseObservable implements  Serializable {
     public int hashCode() {
         int result = id.hashCode();
         result = 31 * result + title.hashCode();
-        result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + latitude.hashCode();
         result = 31 * result + longitude.hashCode();
-        result = 31 * result + (refIdMap != null ? refIdMap.hashCode() : 0);
-        result = 31 * result + (refIdPicture != null ? refIdPicture.hashCode() : 0);
         result = 31 * result + createDate.hashCode();
-        result = 31 * result + (updateDate != null ? updateDate.hashCode() : 0);
         return result;
     }
+
 
     @Override
     public String toString() {
@@ -190,13 +167,11 @@ public class Position extends BaseObservable implements  Serializable {
         sb.append(", description='").append(description).append('\'');
         sb.append(", latitude=").append(latitude);
         sb.append(", longitude=").append(longitude);
-        sb.append(", refIdMap=").append(refIdMap);
-        sb.append(", refIdPicture=").append(refIdPicture);
+        sb.append(", pathMap='").append(pathMap).append('\'');
+        sb.append(", pathPicture='").append(pathPicture).append('\'');
         sb.append(", createDate=").append(createDate);
         sb.append(", updateDate=").append(updateDate);
         sb.append('}');
         return sb.toString();
     }
-
-
 }

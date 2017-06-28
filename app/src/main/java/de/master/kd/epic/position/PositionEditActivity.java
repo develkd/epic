@@ -25,6 +25,7 @@ public class PositionEditActivity extends AppCompatActivity {
 
     private ImageView imageView;
     private FloatingActionButton postionSave;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +79,7 @@ public class PositionEditActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         LatLng latLng = (LatLng)bundle.get(Constants.MAP.LOCATION.name());
 
-       return PositionService.buildPositionWith(String.valueOf(text.getText()), String.valueOf(describe.getText()), latLng,Long.valueOf(imageView.getId()),null);
+       return PositionService.buildPositionWith(String.valueOf(text.getText()), String.valueOf(describe.getText()), latLng,null,null);
 
     }
 }

@@ -19,15 +19,15 @@ public class PositionService {
     }
 
 
-    public static Position buildPositionWith(String title, String description, LatLng latLng, Long picId, Long mapId){
+    public static Position buildPositionWith(String title, String description, LatLng latLng, String pathPicture, String pathMap){
         Position position = new Position();
         position.setId(new Date().getTime());
         position.setTitle(title);
         position.setDescription(description);
         position.setLatitude(latLng.latitude);
         position.setLongitude(latLng.longitude);
-        position.setRefIdPicture(picId);
-        position.setRefIdMap(mapId);
+        position.setPathPicture(pathPicture);
+        position.setPathMap(pathMap);
 
         service.save(position);
         return position;
