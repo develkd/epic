@@ -6,6 +6,8 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
@@ -26,17 +28,14 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import de.master.kd.epic.R;
-import de.master.kd.epic.domain.Position;
+import de.master.kd.epic.domain.position.Position;
 import de.master.kd.epic.map.interfaces.LocationService;
 import de.master.kd.epic.position.PositionEditActivity;
 import de.master.kd.epic.utils.Constants;
 import de.master.kd.epic.utils.LatLngHolder;
 import de.master.kd.epic.utils.StringUtils;
 
-public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,
-        LocationListener {
+public class MapActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
 
     private GoogleMap googleMap;
     private GoogleApiClient googleApiClient;
@@ -50,9 +49,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         setContentView(R.layout.activity_map);
         checkGpsStatus();
 
-          // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+                .findFragmentById(R.id.map_1);
         mapFragment.getMapAsync(this);
 
 
@@ -66,14 +65,14 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
     }
 
-    private void checkGpsStatus(){
+    private void checkGpsStatus() {
         LocationService locationService = new LocationService();
-        if(locationService.isGpsEnabled(this)){
+        if (locationService.isGpsEnabled(this)) {
             Toast.makeText(this, "GPS not present. Use dummy locations", Toast.LENGTH_LONG).show();
             dummyHolder = new LatLngHolder();
         }
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if( locationService.checkLocationPermission(this)){
+            if (locationService.checkLocationPermission(this)) {
                 Toast.makeText(this, "No permission for GPS found", Toast.LENGTH_LONG).show();
             }
         }
@@ -93,9 +92,12 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     public void onMapReady(GoogleMap map) {
         googleMap = map;
         googleMap.setMapType(GoogleMap.MAP_TYPE_NONE);
+        googleMap.getUiSettings().setMapToolbarEnabled(false);
+
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
+                showContextMenu(marker);
                 return false;
             }
         });
@@ -115,17 +117,32 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         }
     }
 
-    protected synchronized void buildGoogleApiClient() {
+    private synchronized void buildGoogleApiClient() {
         googleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
+                .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+                    @Override
+                    public void onConnected(@Nullable Bundle bundle) {
+                        createConnection(bundle);
+                    }
+
+                    @Override
+                    public void onConnectionSuspended(int i) {
+                        System.out.print("AUTSCH");
+                    }
+                })
+                .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+                        System.out.print("AUTSCH");
+                    }
+                })
                 .addApi(LocationServices.API)
                 .build();
+
         googleApiClient.connect();
     }
 
-    @Override
-    public void onConnected(Bundle bundle) {
+    private void createConnection(Bundle bundle) {
 
         locationRequest = new LocationRequest();
         locationRequest.setInterval(1000);
@@ -139,11 +156,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
     }
 
-    @Override
-    public void onConnectionSuspended(int i) {
-        System.out.print("AUTSCH");
-
-    }
 
     @Override
     public void onLocationChanged(Location location) {
@@ -160,11 +172,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
     }
 
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        System.out.print("AUTSCH");
-    }
 
 
 
@@ -196,7 +203,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 }
                 return;
             }
-
             // other 'case' lines to check for other permissions this app might request.
             // You can add here other case statements according to your requirement.
         }
@@ -204,18 +210,14 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
 
     public void markPosition(View view) {
-        if(null != dummyHolder) {
+        if (null != dummyHolder) {
             location = dummyHolder.next();
         }
         Intent position = new Intent(MapActivity.this, PositionEditActivity.class);
 
-         position.putExtra(Constants.MAP.LOCATION.name(), location );
-        startActivityForResult(position,Constants.RESULT.MAP.ordinal());
-
-
-
+        position.putExtra(Constants.MAP.LOCATION.name(), location);
+        startActivityForResult(position, Constants.RESULT.MAP.ordinal());
         //https://www.androidtutorialpoint.com/intermediate/android-map-app-showing-current-location-android/
-
     }
 
     @Override
@@ -223,21 +225,24 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         super.onActivityResult(requestCode, resultCode, data);
         Bundle bundle = data.getExtras();
 
-        Position p = (Position)bundle.get(Constants.MAP.POSITION.name());
+        Position p = (Position) bundle.get(Constants.MAP.POSITION.name());
 
-            Marker marker = googleMap.addMarker(new MarkerOptions()
-                    .position(location)
-                    .title(p.getTitle())
-                    .snippet(StringUtils.cut(p.getDescription(), 10)));
-            marker.setDraggable(false);
-            marker.showInfoWindow();
-
+        Marker marker = googleMap.addMarker(new MarkerOptions()
+                .position(location)
+                .title(p.getTitle())
+                .snippet(StringUtils.cut(p.getDescription(), 1)));
+        marker.setDraggable(false);
+        marker.showInfoWindow();
 
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(location));
 
     }
 
-    public void share(){
+
+    private  void showContextMenu(Marker marker){
+
+    }
+    public void share() {
 //        Intent sendIntent = new Intent();
 //        sendIntent.setAction(Intent.ACTION_SEND);
 //        sendIntent.putExtra(Intent.EXTRA_SUBJECT,"[contenttagger] " + this.note.getTitle());
@@ -245,7 +250,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 //        sendIntent.setType("text/plain");
 //        startActivity(sendIntent);
     }
-
 
 
 }

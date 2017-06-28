@@ -6,20 +6,19 @@ import com.google.android.gms.maps.model.LatLng;
 import java.util.ArrayList;
 import java.util.Date;
 
-import de.master.kd.epic.domain.Position;
-import de.master.kd.epic.persistance.PostionsPersistanceService;
+import de.master.kd.epic.domain.position.Position;
 
 /**
  * Created by pentax on 25.06.17.
  */
 
 public class PositionService {
-    private static final PostionsPersistanceService service = new PostionsPersistanceService();
+    private static final PersistanceService service = new PersistanceService();
     private PositionService(){
     }
 
 
-    public static Position buildPositionWith(String title, String description, LatLng latLng, String pathPicture, String pathMap){
+    public static Position createPositionWith(String title, String description, LatLng latLng, String pathPicture, String pathMap){
         Position position = new Position();
         position.setId(new Date().getTime());
         position.setTitle(title);

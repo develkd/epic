@@ -1,12 +1,19 @@
-package de.master.kd.epic.domain;
+package de.master.kd.epic.domain.position;
 
 import android.provider.BaseColumns;
+
+import java.util.List;
 
 /**
  * Created by kemal.doenmez on 28.06.17.
  */
 
- class PositionTabel implements BaseColumns {
+public final class PositionTabel implements BaseColumns {
+
+    private PositionTabel(){
+
+    }
+
 
     public static final String TABLE = "position";
     public static final String TITLE = "title";
@@ -19,7 +26,8 @@ import android.provider.BaseColumns;
     public static final String UPDATE_DATE = "updateDate";
 
 
-    static String getTableDescription() {
+
+    public static String getTableDescription() {
         StringBuilder builder = new StringBuilder();
         builder.append("CREATE TABLE ");
         builder.append(TABLE).append(" ( ");
@@ -35,4 +43,5 @@ import android.provider.BaseColumns;
 
         return builder.toString();
     }
+
 }

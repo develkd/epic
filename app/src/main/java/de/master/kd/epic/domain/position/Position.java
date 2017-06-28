@@ -1,8 +1,10 @@
-package de.master.kd.epic.domain;
+package de.master.kd.epic.domain.position;
 
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.provider.BaseColumns;
+
+import com.google.android.gms.maps.model.LatLng;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -132,6 +134,7 @@ public class Position extends BaseObservable implements BaseColumns, Serializabl
     private void setCreationTime() {
         setCreateDate(new Date());
     }
+
 
     @Override
     public boolean equals(Object o) {

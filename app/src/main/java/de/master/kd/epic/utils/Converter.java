@@ -2,6 +2,8 @@ package de.master.kd.epic.utils;
 
 
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -30,5 +32,10 @@ public class Converter {
 
     public static final Double toDouble(String value){
         return Double.parseDouble(value);
+    }
+
+
+    public static LatLng toLatLang(Double latitude, Double longitude){
+        return new LatLng(latitude,longitude);
     }
 }

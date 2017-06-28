@@ -4,6 +4,8 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import de.master.kd.epic.domain.position.PositionTabel;
+
 /**
  * Created by kemal.doenmez on 28.06.17.
  */
