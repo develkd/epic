@@ -16,7 +16,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".map.EpicMap"  android:label="@string/title_activity_map" >
+        <activity
+            android:name=".SplashScreen"
+            android:label="@string/title_activity_map">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -39,9 +41,7 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <!-- <activity
-           android:name=".map.MapActivity"-->
-            <!--android:label="@string/title_activity_map" />-->
+        <activity android:name=".map.EpicMap" />
         <activity android:name=".position.PositionEditActivity" />
         <activity android:name=".position.PositionListActivity" />
     </application>

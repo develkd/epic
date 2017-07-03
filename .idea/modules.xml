@@ -4,7 +4,6 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Epic.iml" filepath="$PROJECT_DIR$/Epic.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/epic.iml" filepath="$PROJECT_DIR$/epic.iml" />
     </modules>
   </component>
 </project>
