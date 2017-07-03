@@ -9,7 +9,7 @@ import android.util.EventLogTags;
 public interface Constants {
     public enum MAP {
         POSITION,
-        ALL_POSITIONS,
+        PICTURE,
         LOCATION,
         DESCRIPTION,
         ;

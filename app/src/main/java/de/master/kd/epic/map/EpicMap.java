@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,8 +21,8 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -41,6 +43,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import de.master.kd.epic.R;
 import de.master.kd.epic.domain.position.Position;
 import de.master.kd.epic.map.interfaces.LocationService;
+import de.master.kd.epic.map.interfaces.PictureService;
 import de.master.kd.epic.position.PositionEditActivity;
 import de.master.kd.epic.utils.Constants;
 import de.master.kd.epic.utils.Converter;
@@ -51,7 +54,7 @@ import de.master.kd.epic.utils.StringUtils;
  * Created by pentax on 28.06.17.
  */
 
-public class EpicMap extends FragmentActivity implements OnMapReadyCallback , LocationListener {
+public class EpicMap extends FragmentActivity implements OnMapReadyCallback, LocationListener {
     private GoogleMap googleMap;
     private Marker customMarker;
     private LatLng markerLatLng;
@@ -106,7 +109,6 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback , Lo
     }
 
 
-
     private void setUpMap() {
 
 
@@ -144,27 +146,8 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback , Lo
     }
 
 
-    // Convert a view to bitmap
-    public Bitmap createDrawableFromView(final Context context, final View view) {
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        view.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT));
-        view.measure(displayMetrics.widthPixels, displayMetrics.heightPixels);
-        view.layout(0, 0, displayMetrics.widthPixels, displayMetrics.heightPixels);
-        view.buildDrawingCache();
-
-        Bitmap bitmap = Bitmap.createBitmap(view.getMeasuredWidth(), view.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
-        final Canvas canvas = new Canvas(bitmap);
-        view.draw(canvas);
-
-        return bitmap;
-    }
-
     public void markPosition(View view) {
-
         Intent position = new Intent(EpicMap.this, PositionEditActivity.class);
-
-
         position.putExtra(Constants.MAP.LOCATION.name(), markerLatLng);
         startActivityForResult(position, Constants.RESULT.MAP.ordinal());
         //https://www.androidtutorialpoint.com/intermediate/android-map-app-showing-current-location-android/
@@ -176,17 +159,23 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback , Lo
         Bundle bundle = data.getExtras();
 
         Position p = (Position) bundle.get(Constants.MAP.POSITION.name());
+        Bitmap bitmap = (Bitmap) bundle.get(Constants.MAP.PICTURE.name());
 
         View marker = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.custom_marker_layout, null);
-        final TextView numTxt = (TextView) marker.findViewById(R.id.num_txt);
-        numTxt.setLongClickable(true);
+        final ImageView view = (ImageView) marker.findViewById(R.id.bmp_view);
 
+
+
+        if (null != bitmap) {
+          Bitmap  b = PictureService.resizeBitmap(34,31,bitmap);
+            view.setImageBitmap(b);
+        }
 
         customMarker = googleMap.addMarker(new MarkerOptions()
                 .position(Converter.toLatLang(p.getLatitude(), p.getLongitude()))
                 .title(p.getTitle())
                 .snippet(StringUtils.cut(p.getDescription(), 1))
-                .icon(BitmapDescriptorFactory.fromBitmap(createDrawableFromView(this, marker))));
+                .icon(BitmapDescriptorFactory.fromBitmap(PictureService.createBitmap(this, marker))));
 
 
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(markerLatLng));

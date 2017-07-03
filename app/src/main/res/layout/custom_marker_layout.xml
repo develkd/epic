@@ -12,11 +12,11 @@
         android:onClick="markPosition"
         android:src="@drawable/custom_marker" />
 
-    <TextView
-        android:id="@+id/num_txt"
+    <ImageView
+        android:id="@+id/bmp_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
+        android:layout_marginLeft="5dp"
         android:layout_marginTop="5dp"
         android:gravity="center"
         android:textColor="#72edd6"

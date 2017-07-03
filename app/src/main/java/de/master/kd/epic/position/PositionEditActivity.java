@@ -15,7 +15,7 @@ import com.google.android.gms.maps.model.LatLng;
 import de.master.kd.epic.R;
 import de.master.kd.epic.domain.position.Position;
 import de.master.kd.epic.interfaces.PositionService;
-import de.master.kd.epic.map.MapActivity;
+import de.master.kd.epic.map.EpicMap;
 import de.master.kd.epic.utils.Constants;
 
 public class PositionEditActivity extends AppCompatActivity {
@@ -23,7 +23,7 @@ public class PositionEditActivity extends AppCompatActivity {
 
     private ImageView imageView;
     private FloatingActionButton postionSave;
-
+    private Bitmap bitmap;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,9 +49,10 @@ public class PositionEditActivity extends AppCompatActivity {
 
     private void doSave(View v) {
        Position p =  callPersistPositionService();
-        Intent intent = new Intent(PositionEditActivity.this, MapActivity.class);
+        Intent intent = new Intent(PositionEditActivity.this, EpicMap.class);
 
-       intent.putExtra(Constants.MAP.POSITION.name(), p);
+        intent.putExtra(Constants.MAP.POSITION.name(), p);
+        intent.putExtra(Constants.MAP.PICTURE.name(), bitmap);
         setResult(Constants.RESULT.MAP.ordinal(), intent);
         finish();
     }
@@ -65,7 +66,7 @@ public class PositionEditActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Bundle extras = data.getExtras();
-        Bitmap bitmap = (Bitmap)extras.get("data");
+        bitmap = (Bitmap)extras.get("data");
         assert  null != bitmap;
         imageView.setImageBitmap(bitmap);
     }
