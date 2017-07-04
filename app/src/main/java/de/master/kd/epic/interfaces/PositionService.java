@@ -35,4 +35,16 @@ public class PositionService {
     public static ArrayList<Position> getPositions(){
         return  service.getAllPositions();
     }
+
+    public static Position findPositionBy(LatLng latLng){
+        double lon = latLng.longitude;
+        double lat = latLng.latitude;
+
+        for (Position p: service.getAllPositions()) {
+            if(p.getLatitude() == lat && p.getLongitude() == lon){
+                return p;
+            }
+        }
+        return null;
+    }
 }

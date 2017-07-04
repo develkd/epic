@@ -24,11 +24,12 @@ public class PositionEditActivity extends AppCompatActivity {
     private ImageView imageView;
     private FloatingActionButton postionSave;
     private Bitmap bitmap;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_postion_edit);
-        imageView = (ImageView)findViewById(R.id.imageViewCamera);
+        imageView = (ImageView) findViewById(R.id.imageViewCamera);
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -36,7 +37,7 @@ public class PositionEditActivity extends AppCompatActivity {
             }
         });
 
-        postionSave = (FloatingActionButton)findViewById(R.id.postionSave);
+        postionSave = (FloatingActionButton) findViewById(R.id.postionSave);
         postionSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -48,37 +49,37 @@ public class PositionEditActivity extends AppCompatActivity {
     }
 
     private void doSave(View v) {
-       Position p =  callPersistPositionService();
+        Position p = callPersistPositionService();
         Intent intent = new Intent(PositionEditActivity.this, EpicMap.class);
 
         intent.putExtra(Constants.MAP.POSITION.name(), p);
         intent.putExtra(Constants.MAP.PICTURE.name(), bitmap);
-        setResult(Constants.RESULT.MAP.ordinal(), intent);
+        setResult(Constants.RESULT.MAP_NEW.ordinal(), intent);
         finish();
     }
 
-    public void doSnapShot(View view){
+    public void doSnapShot(View view) {
         Intent intent_picture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(intent_picture,Constants.RESULT.CAMERA.ordinal());
+        startActivityForResult(intent_picture, Constants.RESULT.CAMERA.ordinal());
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Bundle extras = data.getExtras();
-        bitmap = (Bitmap)extras.get("data");
-        assert  null != bitmap;
+        bitmap = (Bitmap) extras.get("data");
+        assert null != bitmap;
         imageView.setImageBitmap(bitmap);
     }
 
 
-    private Position callPersistPositionService(){
-        EditText text = (EditText)findViewById(R.id.titleField);
-        EditText describe = (EditText)findViewById(R.id.describeField);
+    private Position callPersistPositionService() {
+        EditText text = (EditText) findViewById(R.id.titleField);
+        EditText describe = (EditText) findViewById(R.id.describeField);
         Bundle bundle = getIntent().getExtras();
-        LatLng latLng = (LatLng)bundle.get(Constants.MAP.LOCATION.name());
-
-       return PositionService.createPositionWith(String.valueOf(text.getText()), String.valueOf(describe.getText()), latLng,null,null);
+        LatLng latLng = (LatLng) bundle.get(Constants.MAP.LOCATION.name());
+       // Position position = PositionService.findPositionBy(latLng);
+        return  PositionService.createPositionWith(String.valueOf(text.getText()), String.valueOf(describe.getText()), latLng, null, null);
 
     }
 }

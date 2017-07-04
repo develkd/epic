@@ -22,6 +22,7 @@
         android:scaleX="0.8"
         android:scaleY="0.8"
         android:clickable="true"
+        android:visibility="invisible"
         app:rippleColor="@android:color/transparent"
         app:srcCompat="@drawable/ic_edit" />
 
@@ -36,6 +37,7 @@
         android:scaleX="0.8"
         android:scaleY="0.8"
         android:clickable="true"
+        android:visibility="invisible"
         app:rippleColor="@android:color/transparent"
         app:srcCompat="@drawable/ic_route" />
 
@@ -50,6 +52,7 @@
         android:scaleX="0.8"
         android:scaleY="0.8"
         android:clickable="true"
+        android:visibility="invisible"
         app:rippleColor="@android:color/transparent"
         app:srcCompat="@drawable/ic_sync" />
 
@@ -64,6 +67,7 @@
         android:scaleX="0.8"
         android:scaleY="0.8"
         android:clickable="true"
+        android:visibility="invisible"
         app:rippleColor="@android:color/transparent"
         app:srcCompat="@drawable/ic_trash" />
 
@@ -78,5 +82,17 @@
         app:backgroundTint="@color/colorPrimary"
         app:rippleColor="@android:drawable/screen_background_light_transparent"
         app:srcCompat="@drawable/ic_action_point" />
+
+
+    <!--<android.support.design.widget.FloatingActionButton-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="bottom|center"-->
+        <!--android:layout_marginRight="@dimen/fab_margin_right"-->
+        <!--android:layout_marginBottom="16dp"-->
+        <!--android:src="@drawable/ic_action_menu"-->
+        <!--app:elevation="6dp"-->
+        <!--android:id="@+id/item_menu"-->
+        <!--app:pressedTranslationZ="12dp" />-->
 
 </android.support.design.widget.CoordinatorLayout>

@@ -36,24 +36,23 @@ public class Position extends BaseObservable implements BaseColumns, Serializabl
 
     private Date updateDate;
 
+    private Long markerId;
 
-    public Position(Long id, String title, String description, Double latitude,
-                    Double longitude, String pathMap, String pathPicture, Date createDate,
-                    Date updateDate) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.pathMap = pathMap;
-        this.pathPicture = pathPicture;
-        this.createDate = createDate;
-        this.updateDate = updateDate;
-    }
+//    public Position(Long id, String title, String description, Double latitude,
+//                    Double longitude, String pathMap, String pathPicture, Date createDate,
+//                    Date updateDate, Long markerId) {
+//        this.id = id;
+//        this.title = title;
+//        this.description = description;
+//        this.latitude = latitude;
+//        this.longitude = longitude;
+//        this.pathMap = pathMap;
+//        this.pathPicture = pathPicture;
+//        this.createDate = createDate;
+//        this.updateDate = updateDate;
+//        this.markerId = markerId;
+//    }
 
-
-    public Position() {
-    }
 
 
     public Long getId() {
@@ -129,6 +128,13 @@ public class Position extends BaseObservable implements BaseColumns, Serializabl
         this.updateDate = updateDate;
     }
 
+    public Long getMarkerId() {
+        return markerId;
+    }
+
+    public void setMarkerId(Long markerId) {
+        this.markerId = markerId;
+    }
 
     @javax.annotation.PostConstruct
     private void setCreationTime() {
@@ -161,7 +167,6 @@ public class Position extends BaseObservable implements BaseColumns, Serializabl
         return result;
     }
 
-
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("Position{");
@@ -174,6 +179,7 @@ public class Position extends BaseObservable implements BaseColumns, Serializabl
         sb.append(", pathPicture='").append(pathPicture).append('\'');
         sb.append(", createDate=").append(createDate);
         sb.append(", updateDate=").append(updateDate);
+        sb.append(", markerId=").append(markerId);
         sb.append('}');
         return sb.toString();
     }

@@ -20,6 +20,9 @@ public class PictureService {
 
    }
 
+   public static  Bitmap createMarkerIcon(Bitmap src){
+       return resizeBitmap(src,34,31);
+   }
     public static Bitmap createBitmap(final Context context, final View view) {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
@@ -33,7 +36,7 @@ public class PictureService {
         return bitmap;
     }
 
-    public static  Bitmap resizeBitmap(int width, int height,final Bitmap srcBitmap) {
+    public static  Bitmap resizeBitmap(final Bitmap srcBitmap,int width, int height) {
         Bitmap output = Bitmap.createBitmap(width,height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(output);
         Matrix m = new Matrix();

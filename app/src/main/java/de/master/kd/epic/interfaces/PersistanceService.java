@@ -12,6 +12,8 @@ import de.master.kd.epic.domain.position.PositionCRUD;
  */
 
 public class PersistanceService  implements PositionCRUD{
+
+
     @Override
     public Position save(Position position) {
         return null;

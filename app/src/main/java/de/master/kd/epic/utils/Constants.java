@@ -11,12 +11,14 @@ public interface Constants {
         POSITION,
         PICTURE,
         LOCATION,
+        MARKER_ID,
         DESCRIPTION,
         ;
     }
 
     public enum RESULT{
-        MAP,
+        MAP_NEW,
+        MAP_UPDATE,
         CAMERA,
 
         ;

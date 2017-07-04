@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fillAfter="true">
+
+    <!-- Skalierung des Objekts. 300 ms, von 0 -> 80%, lineare berechnung , 50% -> starte anim von der mitte  -->
+    <scale
+        android:duration="300"
+        android:fromXScale="0.8"
+        android:fromYScale="0.8"
+        android:toXScale="0.0"
+        android:toYScale="0.0"
+
+        android:pivotX="50%"
+        android:pivotY="50%"
+    />
+
+    <!-- Durchsichtigkeit vom Objekt-->
+    <alpha
+        android:duration="300"
+        android:fromAlpha="1.0"
+        android:toAlpha="0.0"
+
+    />
+</set>
