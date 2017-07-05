@@ -11,15 +11,20 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -113,8 +118,8 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Loc
             public boolean onMarkerClick(Marker marker) {
                 Projection projection = googleMap.getProjection();
                 selectedMarkerLongLat = marker.getPosition();
-                Point screenPosition = projection.toScreenLocation(selectedMarkerLongLat);
-                Toast.makeText(EpicMap.this, "screenPosition =  " + screenPosition, Toast.LENGTH_LONG).show();
+               // Point screenPosition = projection.toScreenLocation(selectedMarkerLongLat);
+                //  Toast.makeText(EpicMap.this, "screenPosition =  " + screenPosition, Toast.LENGTH_LONG).show();
                 menuBuilder.showMenuItems();
                 return false;
             }
@@ -176,8 +181,6 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Loc
 
       if(Constants.RESULT.MAP_NEW.ordinal() == resultCode){
           addNewMapMarker(data);
-
-
       }
 
         if(Constants.RESULT.MAP_UPDATE.ordinal() == resultCode){
@@ -282,9 +285,10 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Loc
         private Animation showMenu, hideMenu;
         private boolean isOpen = false;
 
-
+       // PopupMenu popupMenu;
 
         public void buildMenu() {
+
             edit_item = getEditActionButton();
             route_item = (FloatingActionButton) findViewById(R.id.item_route_task);
             snych_item = (FloatingActionButton) findViewById(R.id.item_synch_task);
@@ -292,6 +296,15 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Loc
 
             showMenu = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.menu_open);
             hideMenu = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.menu_close);
+
+
+//            popupMenu = new PopupMenu(EpicMap.this, layout);
+//            popupMenu.getMenu().add(1,R.id.item_edit_task,1,"Edit");
+//            popupMenu.getMenu().add(1,R.id.item_route_task,2,"slot2");
+//            popupMenu.getMenu().add(1,R.id.item_synch_task,3,"slot3");
+//            popupMenu.getMenu().add(1,R.id.item_delete_task,4,"slot34");
+
+
         }
 
 
@@ -303,16 +316,15 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Loc
                 route_item.startAnimation(hideMenu);
                 snych_item.startAnimation(hideMenu);
                 trash_item.startAnimation(hideMenu);
-
 //                markerBtn.startAnimation(hideMenu);
                 //item_menu.startAnimation(rotateToClose);
             } else {
-                isOpen = !isOpen;
+                 isOpen = !isOpen;
                 edit_item.startAnimation(showMenu);
                 route_item.startAnimation(showMenu);
                 snych_item.startAnimation(showMenu);
                 trash_item.startAnimation(showMenu);
-//                markerBtn.startAnimation(showMenu);
+                //                markerBtn.startAnimation(showMenu);
                 //item_menu.startAnimation(rotadeToOpen);
             }
 
@@ -324,21 +336,20 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Loc
 
         }
 
-    }
+        private FloatingActionButton getEditActionButton() {
+            FloatingActionButton edit_item = (FloatingActionButton) findViewById(R.id.item_edit_task);
+            edit_item.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent position = new Intent(EpicMap.this, PositionEditActivity.class);
+                    position.putExtra(Constants.MAP.LOCATION.name(), dummyMarkerLatLng);
+                    startActivityForResult(position, Constants.RESULT.MAP_UPDATE.ordinal());
+                    showMenuItems();
+                    //https://www.androidtutorialpoint.com/intermediate/android-map-app-showing-current-location-android/
 
-
-    private FloatingActionButton getEditActionButton() {
-        FloatingActionButton edit_item = (FloatingActionButton) findViewById(R.id.item_edit_task);
-        edit_item.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent position = new Intent(EpicMap.this, PositionEditActivity.class);
-                position.putExtra(Constants.MAP.LOCATION.name(), dummyMarkerLatLng);
-                startActivityForResult(position, Constants.RESULT.MAP_UPDATE.ordinal());
-                //https://www.androidtutorialpoint.com/intermediate/android-map-app-showing-current-location-android/
-
-            }
-        });
-        return edit_item;
+                }
+            });
+            return edit_item;
+        }
     }
 }

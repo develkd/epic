@@ -9,14 +9,12 @@
         android:toXScale="0.8"
         android:toYScale="0.8"
         android:pivotX="50%"
-        android:pivotY="50%"
-        />
+        android:pivotY="50%" />
 
     <!-- Durchsichtigkeit vom Objekt-->
     <alpha
         android:duration="300"
         android:fromAlpha="0.0"
-        android:toAlpha="1.0"
-        />
+        android:toAlpha="1.0"/>
 
 </set>

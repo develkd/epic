@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="140dp"
+    android:layout_height="145dp" >
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/item_edit_task"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|left"
+        android:layout_marginLeft="90dp"
+        android:scaleType="center"
+        android:scaleX="0.8"
+        android:scaleY="0.8"
+        android:visibility="visible"
+        android:clickable="true"
+        app:rippleColor="@android:color/transparent"
+        app:srcCompat="@drawable/ic_edit" />
+
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/item_route_task"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|left"
+        android:layout_marginLeft="75dp"
+        android:layout_marginTop="43dp"
+        android:scaleType="center"
+        android:scaleX="0.8"
+        android:scaleY="0.8"
+        android:visibility="visible"
+        android:clickable="true"
+        app:rippleColor="@android:color/transparent"
+        app:srcCompat="@drawable/ic_route" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/item_synch_task"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|left"
+        android:layout_marginLeft="45dp"
+        android:layout_marginTop="85dp"
+        android:scaleType="center"
+        android:scaleX="0.8"
+        android:scaleY="0.8"
+        android:visibility="visible"
+        android:clickable="true"
+        app:rippleColor="@android:color/transparent"
+        app:srcCompat="@drawable/ic_sync" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/item_delete_task"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|left"
+        android:layout_marginTop="100dp"
+        android:paddingBottom="5dp"
+        android:scaleType="center"
+        android:scaleX="0.8"
+        android:scaleY="0.8"
+        android:visibility="visible"
+        android:clickable="true"
+        app:rippleColor="@android:color/transparent"
+        app:srcCompat="@drawable/ic_trash" />
+
+</android.support.design.widget.CoordinatorLayout>
