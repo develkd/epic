@@ -31,9 +31,9 @@ public class MenuBuilderService {
     private void buildMenu() {
 
         edit_item = getEditActionButton();
+        trash_item = getDeleteActionButton();
         route_item = (FloatingActionButton) activity.findViewById(R.id.item_route_task);
         snych_item = (FloatingActionButton) activity.findViewById(R.id.item_synch_task);
-        trash_item = (FloatingActionButton) activity.findViewById(R.id.item_delete_task);
 
         showMenu = AnimationUtils.loadAnimation(activity.getApplicationContext(), R.anim.menu_open);
         hideMenu = AnimationUtils.loadAnimation(activity.getApplicationContext(), R.anim.menu_close);
@@ -83,6 +83,17 @@ public class MenuBuilderService {
         return edit_item;
     }
 
+    private FloatingActionButton getDeleteActionButton() {
+        FloatingActionButton edit_item = (FloatingActionButton) activity.findViewById(R.id.item_delete_task);
+        edit_item.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleMenuVisibilty();
+                handler.doHandleActionEvent(Constants.REQUEST.DELETE, Constants.RESULT.DELETE);
+            }
+        });
+        return edit_item;
+    }
 
 
 }

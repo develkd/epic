@@ -9,6 +9,7 @@ import android.util.EventLogTags;
 public interface Constants {
     public enum REQUEST {
          EDIT,
+        DELETE,
         ;
     }
 
@@ -23,6 +24,7 @@ public interface Constants {
     public enum RESULT{
         NEW,
         UPDATE,
+        DELETE,
         CAMERA,
 
         ;

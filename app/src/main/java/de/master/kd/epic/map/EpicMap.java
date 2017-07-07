@@ -67,6 +67,7 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Loc
     private FloatingActionButton markerBtn;
     private Marker selectedMarker;
     private boolean isLocationEventAvailable;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -213,6 +214,9 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Loc
         if (Constants.RESULT.UPDATE.ordinal() == resultCode) {
             upateMapMarker(data);
         }
+        if (Constants.RESULT.DELETE.ordinal() == resultCode) {
+            deleteMapMarker();
+        }
     }
 
 
@@ -259,11 +263,18 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Loc
         setDummyLocation(false);
     }
 
-    private void setDummyLocation(boolean odd){
-        if(!isLocationEventAvailable){
+    private void deleteMapMarker() {
+        selectedMarker.remove();
+        selectedMarker = null;
+        setDummyLocation(false);
+    }
+
+    private void setDummyLocation(boolean odd) {
+        if (!isLocationEventAvailable) {
             location = odd ? holder.next() : holder.before();
         }
     }
+
     @Override
     public void onLocationChanged(Location aLocation) {
         //Place current location marker
@@ -354,20 +365,27 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Loc
 
     @Override
     public void doHandleActionEvent(Constants.REQUEST request, Constants.RESULT result) {
-         switch (request) {
+        switch (request) {
             case EDIT:
                 handleEditRequest();
                 break;
-        }
 
+            case DELETE:
+                deleteMapMarker();
+                break;
+        }
     }
 
 
-    private void handleEditRequest(){
+    private void handleEditRequest() {
+        if(null == selectedMarker){
+            Toast.makeText(this, "Keine Marke zum Löschen vorhanden", Toast.LENGTH_LONG).show();
+        }
         Intent intent = new Intent(EpicMap.this, PositionEditActivity.class);
         intent.putExtra(Constants.PARAMETER.LOCATION.name(), selectedMarker.getPosition());
         startActivityForResult(intent, Constants.RESULT.UPDATE.ordinal());
     }
+
     private View getMarkerLayout() {
         return ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.custom_marker_layout, null);
     }
