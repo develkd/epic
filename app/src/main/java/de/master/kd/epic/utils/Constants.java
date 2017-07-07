@@ -8,25 +8,23 @@ import android.util.EventLogTags;
 
 public interface Constants {
     public enum REQUEST {
-         EDIT,
+        EDIT,
         DELETE,
-        ;
+        SHARE,;
     }
 
     public enum PARAMETER {
         POSITION,
         PICTURE,
         LOCATION,
-        POSITION_ID,
-        ;
+        POSITION_ID,;
     }
 
-    public enum RESULT{
+    public enum RESULT {
         NEW,
         UPDATE,
         DELETE,
         CAMERA,
-
-        ;
+        SHARED,;
     }
 }

@@ -4,14 +4,19 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.widget.Toast;
 
+import de.master.kd.epic.infomessage.AlertDialogMessageConfigurator;
+import de.master.kd.epic.infomessage.InfoMessage;
 import de.master.kd.epic.map.EpicMap;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;

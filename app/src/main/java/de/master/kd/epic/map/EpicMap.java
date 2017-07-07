@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationListener;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -182,7 +183,6 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Loc
                 Toast.makeText(this, "No permission for GPS found", Toast.LENGTH_LONG).show();
             }
         }
-
     }
 
 
@@ -212,18 +212,23 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Loc
         }
 
         if (Constants.RESULT.UPDATE.ordinal() == resultCode) {
-            upateMapMarker(data);
+            updateMapMarker(data);
         }
         if (Constants.RESULT.DELETE.ordinal() == resultCode) {
             deleteMapMarker();
         }
+        if(Constants.RESULT.SHARED.ordinal() == resultCode){
+            shareMapMarker();
+        }
     }
 
 
-    private void addNewMapMarker(Intent data) {
-        Bundle bundle = data.getExtras();
-
+    private Position getIntendedPosition(Bundle bundle){
         Position p = (Position) bundle.get(Constants.PARAMETER.POSITION.name());
+        return p;
+    }
+
+    private View getPictureLayout(Bundle bundle){
         Bitmap bitmap = (Bitmap) bundle.get(Constants.PARAMETER.PICTURE.name());
         View layout = getMarkerLayout();
         ImageView view = (ImageView) layout.findViewById(R.id.bmp_view);
@@ -231,7 +236,14 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Loc
             Bitmap b = PictureService.createMarkerIcon(bitmap);
             view.setImageBitmap(b);
         }
+        return layout;
+    }
 
+
+    private void addNewMapMarker(Intent data) {
+        Bundle bundle = data.getExtras();
+        Position p = getIntendedPosition(bundle);
+        View layout = getPictureLayout(bundle);
 
         Marker marker = googleMap.addMarker(new MarkerOptions()
                 .position(Converter.toLatLang(p.getLatitude(), p.getLongitude()))
@@ -245,16 +257,11 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Loc
     }
 
 
-    private void upateMapMarker(Intent data) {
+    private void updateMapMarker(Intent data) {
         Bundle bundle = data.getExtras();
-        Position p = (Position) bundle.get(Constants.PARAMETER.POSITION.name());
-        Bitmap bitmap = (Bitmap) bundle.get(Constants.PARAMETER.PICTURE.name());
-        View layout = getMarkerLayout();
-        ImageView view = (ImageView) layout.findViewById(R.id.bmp_view);
-        if (null != bitmap) {
-            Bitmap b = PictureService.createMarkerIcon(bitmap);
-            view.setImageBitmap(b);
-        }
+        Position p = getIntendedPosition(bundle);
+        View layout = getPictureLayout(bundle);
+
         selectedMarker.setTitle(p.getTitle());
         selectedMarker.setSnippet(StringUtils.cut(p.getDescription(), p.getTitle().length()));
         selectedMarker.setIcon(BitmapDescriptorFactory.fromBitmap(PictureService.createBitmap(this, layout)));
@@ -268,6 +275,39 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Loc
         selectedMarker = null;
         setDummyLocation(false);
     }
+
+    private void shareMapMarker() {
+
+
+        LatLng location = selectedMarker.getPosition();
+        Double latitude = location.latitude;
+        Double longitude = location.longitude;
+
+//        String uri = "geo:" + latitude + ","
+//                +longitude + "?q=" + latitude
+//                + "," + longitude;
+//        startActivity(new Intent(android.content.Intent.ACTION_VIEW,
+//                Uri.parse(uri)));
+
+        String uri = "http://maps.google.com/maps?saddr=" +location.latitude+","+location.longitude;
+        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+        sharingIntent.setType("text/plain");
+        String ShareSub = "Here is my location";
+        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, selectedMarker.getTitle());
+        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT,  uri);
+        startActivity(Intent.createChooser(sharingIntent, "Share via"));
+
+
+
+//        Intent sendIntent = new Intent();
+//        sendIntent.setAction(Intent.ACTION_SEND);
+//        sendIntent.putExtra(Intent.EXTRA_SUBJECT,"[contenttagger] " + selectedMarker.getTitle());
+//        sendIntent.putExtra(Intent.EXTRA_TEXT, selectedMarker.getPosition() + "\n\n [sent from contenttagger@android]");
+//        sendIntent.setType("text/plain");
+//        startActivity(sendIntent);
+
+    }
+
 
     private void setDummyLocation(boolean odd) {
         if (!isLocationEventAvailable) {
@@ -306,15 +346,6 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Loc
     @Override
     public void onProviderDisabled(String provider) {
         Toast.makeText(this, "GPS ist deaktiviert", Toast.LENGTH_LONG).show();
-    }
-
-    public void share() {
-//        Intent sendIntent = new Intent();
-//        sendIntent.setAction(Intent.ACTION_SEND);
-//        sendIntent.putExtra(Intent.EXTRA_SUBJECT,"[contenttagger] " + this.note.getTitle());
-//        sendIntent.putExtra(Intent.EXTRA_TEXT, this.note.getContent() + "\n\n [sent from contenttagger@android]");
-//        sendIntent.setType("text/plain");
-//        startActivity(sendIntent);
     }
 
     private synchronized void buildGoogleApiClient() {
@@ -373,7 +404,15 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Loc
             case DELETE:
                 deleteMapMarker();
                 break;
+
+            case SHARE:
+                shareMapMarker();
+                break;
+
+            default:
+                throw  new IllegalArgumentException("Requesttype "+request+" not supported yet");
         }
+
     }
 
 

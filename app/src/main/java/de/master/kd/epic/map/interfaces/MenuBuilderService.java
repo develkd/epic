@@ -15,7 +15,7 @@ import de.master.kd.epic.utils.Constants;
 
 public class MenuBuilderService {
 
-    private FloatingActionButton edit_item, route_item, snych_item, trash_item;
+    private FloatingActionButton edit_item, route_item, snych_item, trash_item, share_item;
     private Animation showMenu, hideMenu;
     private boolean isOpen = false;
     private MenuItemHandler handler;
@@ -32,6 +32,7 @@ public class MenuBuilderService {
 
         edit_item = getEditActionButton();
         trash_item = getDeleteActionButton();
+        share_item = getShareActionButton();
         route_item = (FloatingActionButton) activity.findViewById(R.id.item_route_task);
         snych_item = (FloatingActionButton) activity.findViewById(R.id.item_synch_task);
 
@@ -54,21 +55,23 @@ public class MenuBuilderService {
 
     }
 
-      private void animateMenuItems(boolean show) {
+    private void animateMenuItems(boolean show) {
         Animation anim = show ? showMenu : hideMenu;
 
         edit_item.startAnimation(anim);
         route_item.startAnimation(anim);
         snych_item.startAnimation(anim);
         trash_item.startAnimation(anim);
+        share_item.startAnimation(anim);
 
-     }
+    }
 
-    private void enableClickEvent(boolean enable){
+    private void enableClickEvent(boolean enable) {
         edit_item.setClickable(enable);
         route_item.setClickable(enable);
         snych_item.setClickable(enable);
         trash_item.setClickable(enable);
+        share_item.setClickable(enable);
     }
 
     private FloatingActionButton getEditActionButton() {
@@ -95,5 +98,16 @@ public class MenuBuilderService {
         return edit_item;
     }
 
+    private FloatingActionButton getShareActionButton() {
+        FloatingActionButton edit_item = (FloatingActionButton) activity.findViewById(R.id.item_share_task);
+        edit_item.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleMenuVisibilty();
+                handler.doHandleActionEvent(Constants.REQUEST.SHARE, Constants.RESULT.SHARED);
+            }
+        });
+        return edit_item;
+    }
 
 }
