@@ -1,19 +1,15 @@
-package de.master.kd.epic.persistance;
+package de.master.kd.epic.domain.interfaces;
 
-import android.content.Context;
+import java.util.ArrayList;
 
-import java.util.List;
-
-import de.master.kd.epic.domain.EpicDatabase;
 import de.master.kd.epic.domain.position.Position;
 import de.master.kd.epic.domain.position.PositionCRUD;
-import de.master.kd.epic.exceptions.ElementNotFoundException;
 
 /**
- * Created by kemal.doenmez on 28.06.17.
+ * Created by pentax on 28.06.17.
  */
 
-public class PositionPersistanceService implements PositionCRUD {
+public class PersistanceService  implements PositionCRUD{
 
 
     @Override
@@ -37,7 +33,7 @@ public class PositionPersistanceService implements PositionCRUD {
     }
 
     @Override
-    public List<Position> getAllPositions() {
+    public ArrayList<Position> getAllPositions() {
         return null;
     }
 }

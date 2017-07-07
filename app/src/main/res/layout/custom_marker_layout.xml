@@ -29,9 +29,4 @@
         android:textSize="25dp"
         android:textStyle="bold" />
 
-
-    <!--<include-->
-        <!--layout="@layout/menu"-->
-        <!--android:layout_width="140dp"-->
-        <!--android:layout_height="145dp"/>-->
 </android.support.design.widget.CoordinatorLayout>

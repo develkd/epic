@@ -14,7 +14,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 import de.master.kd.epic.R;
 import de.master.kd.epic.domain.position.Position;
-import de.master.kd.epic.interfaces.PositionService;
+import de.master.kd.epic.domain.interfaces.PositionService;
 import de.master.kd.epic.map.EpicMap;
 import de.master.kd.epic.utils.Constants;
 

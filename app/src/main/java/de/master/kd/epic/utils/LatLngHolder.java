@@ -29,6 +29,11 @@ public class LatLngHolder {
 
     }
 
+    public void addRealLocation(LatLng location){
+        list.clear();
+        list.add(location);
+        index = 0;
+    }
     public LatLng next() {
         if (index > -1) {
             return list.get(index--);

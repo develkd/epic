@@ -7,8 +7,10 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.location.Location;
+import android.location.LocationListener;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
@@ -29,7 +31,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
+
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -45,6 +47,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import de.master.kd.epic.R;
 import de.master.kd.epic.domain.position.Position;
+import de.master.kd.epic.infomessage.AlertDialogMessageConfigurator;
+import de.master.kd.epic.infomessage.InfoMessage;
 import de.master.kd.epic.map.interfaces.LocationService;
 import de.master.kd.epic.map.interfaces.PictureService;
 import de.master.kd.epic.position.PositionEditActivity;
@@ -60,9 +64,7 @@ import de.master.kd.epic.utils.StringUtils;
 public class EpicMap extends FragmentActivity implements OnMapReadyCallback, LocationListener {
     private GoogleMap googleMap;
 
-    private LatLng dummyMarkerLatLng;
     private LatLngHolder holder = new LatLngHolder();
-    private LatLngHolder dummyHolder;
     private GoogleApiClient googleApiClient;
     private LocationRequest locationRequest;
     private LatLng location;
@@ -73,9 +75,6 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Loc
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.map_layout);
-
-        dummyMarkerLatLng = holder.next();
-
         setUpMapIfNeeded();
         menuBuilder = new MenuBuilder();
         menuBuilder.buildMenu();
@@ -128,35 +127,63 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Loc
 
 
     private void setUpMap() {
-
-
         final View mapView = getSupportFragmentManager().findFragmentById(R.id.epic_map).getView();
         if (mapView.getViewTreeObserver().isAlive()) {
             mapView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-
                 // We check which build version we are using.
                 @Override
                 public void onGlobalLayout() {
-                    LatLngBounds bounds = new LatLngBounds.Builder().include(dummyMarkerLatLng).build();
                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
                         mapView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                     } else {
                         mapView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                     }
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 10));
                 }
             });
         }
     }
 
     private void checkGpsStatus() {
-        LocationService locationService = new LocationService();
-        if (locationService.isGpsEnabled(this)) {
-            Toast.makeText(this, "GPS not present. Use dummy locations", Toast.LENGTH_LONG).show();
-            dummyHolder = new LatLngHolder();
+        LocationService locationService = new LocationService(this);
+
+        if (!locationService.isGpsEnabled()) {
+            InfoMessage.showAllertDialog(this, new AlertDialogMessageConfigurator() {
+                @Override
+                public String getTitle() {
+                    return "GPS-Einstellungen";
+                }
+
+                @Override
+                public String getMessage() {
+                    return "GPS ist nicht aktive. Möchten Sie das GPS aktivieren?";
+                }
+
+                @Override
+                public String getPositiveButtonName() {
+                    return "Aktivieren";
+                }
+
+                @Override
+                public String getNegativeButtonName() {
+                    return "Abbrechen";
+                }
+
+                @Override
+                public void doPostiveOnClickHandling() {
+                    Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    EpicMap.this.startActivity(intent);
+                }
+
+                @Override
+                public void doNegativeOnClickHandling() {
+                    location = holder.next();
+                }
+            });
+
         }
+
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (locationService.checkLocationPermission(this)) {
+             if (!locationService.checkLocationPermission(EpicMap.this)) {
                 Toast.makeText(this, "No permission for GPS found", Toast.LENGTH_LONG).show();
             }
         }
@@ -165,9 +192,18 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Loc
 
 
     private void markPosition(View view) {
+        if(null == location){
+            Toast.makeText(this, "Nutze Dummywerte", Toast.LENGTH_SHORT).show();
 
+
+            location = holder.next();
+            Location l = new Location("noGPSLocation");
+           l.setLongitude(location.longitude);
+            l.setLongitude(location.longitude);
+            onLocationChanged(l);
+        }
         Intent position = new Intent(EpicMap.this, PositionEditActivity.class);
-        position.putExtra(Constants.MAP.LOCATION.name(), dummyMarkerLatLng);
+        position.putExtra(Constants.MAP.LOCATION.name(), location);
         startActivityForResult(position, Constants.RESULT.MAP_NEW.ordinal());
         //https://www.androidtutorialpoint.com/intermediate/android-map-app-showing-current-location-android/
     }
@@ -211,23 +247,40 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Loc
                 .icon(BitmapDescriptorFactory.fromBitmap(PictureService.createBitmap(this, layout))));
 
 
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(dummyMarkerLatLng));
-        dummyMarkerLatLng = holder.next();
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(location));
+        location = holder.next();
     }
 
     @Override
-    public void onLocationChanged(Location location) {
-        //Place current location marker
-        this.location = new LatLng(location.getLatitude(), location.getLongitude());
+    public void onLocationChanged(Location aLocation) {
+             //Place current location marker
+        this.location = new LatLng(aLocation.getLatitude(), aLocation.getLongitude());
         //move map camera
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(this.location));
-        googleMap.animateCamera(CameraUpdateFactory.zoomTo(11));
+        //googleMap.moveCamera(CameraUpdateFactory.newLatLng(this.location));
+        LatLngBounds bounds = new LatLngBounds.Builder().include(location).build();
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 10));
+        googleMap.animateCamera(CameraUpdateFactory.zoomTo(10));
 
-        //stop location updates
-        if (googleApiClient != null) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
-        }
+//        //stop location updates
+//        if (googleApiClient != null) {
+//            LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
+//        }
 
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+        Toast.makeText(this, "GPS ist aktiviert", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+        Toast.makeText(this, "GPS ist deaktiviert", Toast.LENGTH_LONG).show();
     }
 
     public void share() {
@@ -271,11 +324,11 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Loc
         locationRequest.setInterval(1000);
         locationRequest.setFastestInterval(1000);
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
-        }
+//        if (ContextCompat.checkSelfPermission(this,
+//                Manifest.permission.ACCESS_FINE_LOCATION)
+//                == PackageManager.PERMISSION_GRANTED) {
+//            LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
+//        }
 
     }
 
@@ -342,7 +395,7 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Loc
                 @Override
                 public void onClick(View v) {
                     Intent position = new Intent(EpicMap.this, PositionEditActivity.class);
-                    position.putExtra(Constants.MAP.LOCATION.name(), dummyMarkerLatLng);
+                    position.putExtra(Constants.MAP.LOCATION.name(), location);
                     startActivityForResult(position, Constants.RESULT.MAP_UPDATE.ordinal());
                     showMenuItems();
                     //https://www.androidtutorialpoint.com/intermediate/android-map-app-showing-current-location-android/

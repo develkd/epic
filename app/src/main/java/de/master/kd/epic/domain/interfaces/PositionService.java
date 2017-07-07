@@ -1,4 +1,4 @@
-package de.master.kd.epic.interfaces;
+package de.master.kd.epic.domain.interfaces;
 
 import com.google.android.gms.maps.model.LatLng;
 
