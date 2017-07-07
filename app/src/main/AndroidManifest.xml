@@ -21,7 +21,7 @@
         android:supportsRtl="true"
         android:theme="@style/DefaultTheme">
         <activity
-            android:name=".map.EpicMap"
+            android:name=".SplashScreen"
             android:label="@string/title_activity_map"
             android:theme="@style/SplashTheme">
             <intent-filter>
@@ -29,8 +29,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!--<activity android:name=".map.EpicMap"-->
-            <!--android:theme="@style/ActionBarTheme"/>-->
+        <activity android:name=".map.EpicMap"
+            android:theme="@style/ActionBarTheme"/>
         <activity android:name=".position.PositionEditActivity" />
         <activity android:name=".position.PositionListActivity" />
         <!--<activity-->
