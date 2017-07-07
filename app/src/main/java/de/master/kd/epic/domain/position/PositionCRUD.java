@@ -1,5 +1,7 @@
 package de.master.kd.epic.domain.position;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.util.List;
 
 /**
@@ -14,7 +16,9 @@ public interface PositionCRUD {
 
     void delete(Position p);
 
-    Position read(String title);
+    Position find(String title);
+    Position find(Long id);
+    Position find(LatLng latLng);
 
     List<Position> getAllPositions();
 

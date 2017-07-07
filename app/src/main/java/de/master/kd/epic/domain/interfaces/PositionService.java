@@ -14,13 +14,17 @@ import de.master.kd.epic.domain.position.Position;
 
 public class PositionService {
     private static final PersistanceService service = new PersistanceService();
-    private PositionService(){
+
+    private PositionService() {
     }
 
 
-    public static Position createPositionWith(String title, String description, LatLng latLng, String pathPicture, String pathMap){
-        Position position = new Position();
-        position.setId(new Date().getTime());
+    public static Position save(final Position currentPosition, String title, String description, LatLng latLng, String pathPicture, String pathMap) {
+        Position position = currentPosition;
+        if (null == currentPosition) {
+            position = new Position();
+            position.setId(new Date().getTime());
+        }
         position.setTitle(title);
         position.setDescription(description);
         position.setLatitude(latLng.latitude);
@@ -32,16 +36,17 @@ public class PositionService {
         return position;
     }
 
-    public static ArrayList<Position> getPositions(){
-        return  service.getAllPositions();
+
+    public static ArrayList<Position> getPositions() {
+        return service.getAllPositions();
     }
 
-    public static Position findPositionBy(LatLng latLng){
+    public static Position findPositionBy(LatLng latLng) {
         double lon = latLng.longitude;
         double lat = latLng.latitude;
 
-        for (Position p: service.getAllPositions()) {
-            if(p.getLatitude() == lat && p.getLongitude() == lon){
+        for (Position p : service.getAllPositions()) {
+            if (p.getLatitude() == lat && p.getLongitude() == lon) {
                 return p;
             }
         }

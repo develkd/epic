@@ -107,12 +107,12 @@
     <ImageView
         android:id="@+id/imageViewCamera"
         android:layout_width="100dp"
-        android:layout_height="150dp"
+        android:layout_height="100dp"
         android:layout_alignLeft="@+id/linearLayout2"
         android:layout_alignStart="@+id/linearLayout2"
         android:layout_below="@+id/textView5"
         android:layout_marginLeft="16dp"
-        app:srcCompat="@drawable/splash" />
+        app:srcCompat="@drawable/ic_menu_camera" />
 
 
     <android.support.design.widget.FloatingActionButton
@@ -142,11 +142,11 @@
     <ImageView
         android:id="@+id/imageView5"
         android:layout_width="100dp"
-        android:layout_height="150dp"
+        android:layout_height="100dp"
         android:layout_alignEnd="@+id/linearLayout2"
         android:layout_alignRight="@+id/linearLayout2"
         android:layout_below="@+id/textView6"
         android:layout_marginRight="16dp"
-        app:srcCompat="@drawable/splash" />
+        app:srcCompat="@drawable/ic_menu_gallery" />
 
 </RelativeLayout>

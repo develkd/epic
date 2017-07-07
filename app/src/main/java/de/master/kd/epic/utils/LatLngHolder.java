@@ -34,11 +34,20 @@ public class LatLngHolder {
         list.add(location);
         index = 0;
     }
+
+    public LatLng before() {
+        if (index < list.size()) {
+            return list.get(index++);
+        }
+
+        return list.get(0);
+    }
     public LatLng next() {
         if (index > -1) {
             return list.get(index--);
         }
 
-        return null;
+        index = 0;
+        return list.get(index);
     }
 }

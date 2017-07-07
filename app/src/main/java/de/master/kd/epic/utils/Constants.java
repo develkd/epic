@@ -7,18 +7,22 @@ import android.util.EventLogTags;
  */
 
 public interface Constants {
-    public enum MAP {
+    public enum REQUEST {
+         EDIT,
+        ;
+    }
+
+    public enum PARAMETER {
         POSITION,
         PICTURE,
         LOCATION,
-        MARKER_ID,
-        DESCRIPTION,
+        POSITION_ID,
         ;
     }
 
     public enum RESULT{
-        MAP_NEW,
-        MAP_UPDATE,
+        NEW,
+        UPDATE,
         CAMERA,
 
         ;
