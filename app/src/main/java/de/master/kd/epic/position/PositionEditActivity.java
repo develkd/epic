@@ -84,7 +84,7 @@ public class PositionEditActivity extends AppCompatActivity {
     }
 
     private Constants.RESULT getResultType(){
-        return null == actualPosition ? Constants.RESULT.NEW : Constants.RESULT.UPDATE;
+        return null == actualPosition ? Constants.RESULT.NEW : Constants.RESULT.UPDATED;
     }
     public void doSnapShot(View view) {
         Intent intent_picture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);

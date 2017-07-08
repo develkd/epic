@@ -12,7 +12,7 @@ import de.master.kd.epic.domain.position.PositionCRUD;
  * Created by pentax on 28.06.17.
  */
 
-public class PersistanceService implements PositionCRUD {
+public class PositionRepository implements PositionCRUD {
 
 
     private ArrayList<Position> postions = new ArrayList<>();

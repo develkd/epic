@@ -22,9 +22,10 @@ public interface Constants {
 
     public enum RESULT {
         NEW,
-        UPDATE,
-        DELETE,
+        UPDATED,
         CAMERA,
-        SHARED,;
+        NO_RESULT_CHECK,
+
+        ;
     }
 }

@@ -80,7 +80,7 @@ public class MenuBuilderService {
             @Override
             public void onClick(View v) {
                 toggleMenuVisibilty();
-                handler.doHandleActionEvent(Constants.REQUEST.EDIT, Constants.RESULT.UPDATE);
+                handler.doHandleActionEvent(Constants.REQUEST.EDIT, Constants.RESULT.UPDATED);
             }
         });
         return edit_item;
@@ -92,7 +92,7 @@ public class MenuBuilderService {
             @Override
             public void onClick(View v) {
                 toggleMenuVisibilty();
-                handler.doHandleActionEvent(Constants.REQUEST.DELETE, Constants.RESULT.DELETE);
+                handler.doHandleActionEvent(Constants.REQUEST.DELETE, Constants.RESULT.NO_RESULT_CHECK);
             }
         });
         return edit_item;
@@ -104,7 +104,7 @@ public class MenuBuilderService {
             @Override
             public void onClick(View v) {
                 toggleMenuVisibilty();
-                handler.doHandleActionEvent(Constants.REQUEST.SHARE, Constants.RESULT.SHARED);
+                handler.doHandleActionEvent(Constants.REQUEST.SHARE, Constants.RESULT.NO_RESULT_CHECK);
             }
         });
         return edit_item;

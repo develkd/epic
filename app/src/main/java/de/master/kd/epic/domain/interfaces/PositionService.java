@@ -13,7 +13,7 @@ import de.master.kd.epic.domain.position.Position;
  */
 
 public class PositionService {
-    private static final PersistanceService service = new PersistanceService();
+    private static final PositionRepository service = new PositionRepository();
 
     private PositionService() {
     }
@@ -51,5 +51,14 @@ public class PositionService {
             }
         }
         return null;
+    }
+
+    public static void remove(LatLng position) {
+        Position p = findPositionBy(position);
+        if(null == p){
+            return;
+        }
+
+        getPositions().remove(p);
     }
 }
