@@ -38,22 +38,6 @@ public class Position extends BaseObservable implements BaseColumns, Serializabl
 
     private Long markerId;
 
-//    public Position(Long id, String title, String description, Double latitude,
-//                    Double longitude, String pathMap, String pathPicture, Date createDate,
-//                    Date updateDate, Long markerId) {
-//        this.id = id;
-//        this.title = title;
-//        this.description = description;
-//        this.latitude = latitude;
-//        this.longitude = longitude;
-//        this.pathMap = pathMap;
-//        this.pathPicture = pathPicture;
-//        this.createDate = createDate;
-//        this.updateDate = updateDate;
-//        this.markerId = markerId;
-//    }
-
-
 
     public Long getId() {
         return id;

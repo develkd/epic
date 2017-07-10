@@ -69,7 +69,7 @@ import de.master.kd.epic.utils.StringUtils;
 public class EpicMap extends FragmentActivity implements OnMapReadyCallback, MenuItemHandler {
     private GoogleMap googleMap;
 
-    private LatLngHolder holder = new LatLngHolder();
+ //   private LatLngHolder holder = new LatLngHolder();
     private GoogleApiClient googleApiClient;
     private LocationRequest locationRequest;
     private LatLng location;
@@ -86,7 +86,7 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
         setContentView(R.layout.map_layout);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.epic_map);
         mapFragment.getMapAsync(this);
-        createLocationManager();
+
 
         markerBtn = (FloatingActionButton) findViewById(R.id.select_point);
         markerBtn.setOnClickListener(new View.OnClickListener() {
@@ -108,10 +108,12 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
                 doLocate(location);
             }
         });
+
     }
 
 
     public void onMapReady(final GoogleMap map) {
+        checkGpsStatus();
         this.googleMap = map;
 
 
@@ -128,8 +130,10 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
+
+
         googleMap.setMyLocationEnabled(true);
-        checkGpsStatus();
+
         //  setUpMap();
         //Initialize Google Play Services
 //        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -155,17 +159,15 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
     }
 
     private void checkGpsStatus() {
-        GpsService service = new GpsService(this);
-        service.isGpsEnabled();
+       if( new GpsService(this).isGpsEnabled()){
+           createLocationManager();
+       }
     }
 
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (null == data) {
-            return;
-        }
 
         if (Constants.RESULT.NEW.ordinal() == resultCode) {
             addNewMapMarker(data);
@@ -174,14 +176,34 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
         if (Constants.RESULT.UPDATED.ordinal() == resultCode) {
             updateMapMarker(data);
         }
+        if(Constants.RESULT.GPS_ACTIVATED.ordinal() == requestCode){
+            checkGpsStatus();
+        }
 
     }
 
+
+    public void activateGPS(){
+        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        startActivityForResult(intent, Constants.RESULT.GPS_ACTIVATED.ordinal());
+    }
+
+    public void disableGPS() {
+    }
 
     @Override
     public Activity getImplementer() {
         return this;
     }
+
+    public void doLocate(Location aLocation) {
+        isLocationEventAvailable = true;
+        location = new LatLng(aLocation.getLatitude(), aLocation.getLongitude());
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 16.2f));
+        googleMap.animateCamera(CameraUpdateFactory.zoomTo(16.2f));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(location));
+    }
+
 
     @Override
     public void doHandleActionEvent(Constants.REQUEST request, Constants.RESULT result) {
@@ -227,25 +249,15 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
 //    }
 
 
-    private void doLocate(Location aLocation) {
-        isLocationEventAvailable = true;
-        location = new LatLng(aLocation.getLatitude(), aLocation.getLongitude());
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 16.2f));
-        googleMap.animateCamera(CameraUpdateFactory.zoomTo(16.2f));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(location));
-    }
-
 
 
 
     private void markPosition(View view) {
         if (null == location) {
-            Toast.makeText(this, "Nutze Dummywerte", Toast.LENGTH_SHORT).show();
-            setDummyLocation(true);
-            Location l = new Location("noGPSLocation");
-            l.setLongitude(location.longitude);
-            l.setLongitude(location.longitude);
+            Toast.makeText(this, "GPS ist nicht bereit", Toast.LENGTH_SHORT).show();
+            return;
         }
+
         Intent position = new Intent(EpicMap.this, PositionEditActivity.class);
         position.putExtra(Constants.PARAMETER.LOCATION.name(), location);
         startActivityForResult(position, Constants.RESULT.NEW.ordinal());
@@ -275,6 +287,10 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
     }
 
     private void addNewMapMarker(Intent data) {
+        if(null == data){
+            return;
+        }
+
         Bundle bundle = data.getExtras();
         Position p = getIntendedPosition(bundle);
         View layout = getPictureLayout(bundle);
@@ -287,11 +303,15 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
 
 
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(location));
-        setDummyLocation(true);
+     //   setDummyLocation(true);
     }
 
 
     private void updateMapMarker(Intent data) {
+        if(null == data){
+            return;
+        }
+
         Bundle bundle = data.getExtras();
         Position p = getIntendedPosition(bundle);
         View layout = getPictureLayout(bundle);
@@ -301,17 +321,17 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
         selectedMarker.setIcon(BitmapDescriptorFactory.fromBitmap(PictureService.createBitmap(this, layout)));
         location = selectedMarker.getPosition();
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(location));
-        setDummyLocation(false);
+       // setDummyLocation(false);
     }
 
 
 
 
-    public void setDummyLocation(boolean odd) {
-        if (!isLocationEventAvailable) {
-            location = odd ? holder.next() : holder.before();
-        }
-    }
+//    public void setDummyLocation(boolean odd) {
+//        if (!isLocationEventAvailable) {
+//            location = odd ? holder.next() : holder.before();
+//        }
+//    }
 
 
     private synchronized void buildGoogleApiClient() {
@@ -360,7 +380,7 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
         selectedMarker.remove();
         PositionService.remove(selectedMarker.getPosition());
         selectedMarker = null;
-        setDummyLocation(false);
+       // setDummyLocation(false);
     }
 
     private void handleEditRequest() {
@@ -409,6 +429,7 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
 //        startActivity(sendIntent);
 
     }
+
 
 
 }

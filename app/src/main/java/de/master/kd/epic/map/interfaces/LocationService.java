@@ -35,7 +35,6 @@ public class LocationService {
     private LocationManager locationManager;
 
 
-
 //    public boolean isGpsEnabled() {
 //        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 //    }
@@ -90,7 +89,7 @@ public class LocationService {
     }
 
 
-    public  void createLocationManager(EpicMap epicMap, final LocationHandler locationHandler) {
+    public  void createLocationManager(final EpicMap epicMap, final LocationHandler locationHandler) {
         locationManager = (LocationManager) epicMap.getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(epicMap,
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
@@ -115,17 +114,17 @@ public class LocationService {
 
                 @Override
                 public void onStatusChanged(String provider, int status, Bundle extras) {
-
+                    Toast.makeText(epicMap, "onStatusChanged", Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
                 public void onProviderEnabled(String provider) {
-
+                    Toast.makeText(epicMap, "onProviderEnabled", Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
                 public void onProviderDisabled(String provider) {
-
+                    Toast.makeText(epicMap, "onProviderDisabled", Toast.LENGTH_SHORT).show();
                 }
             });
         }else if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
@@ -137,17 +136,18 @@ public class LocationService {
 
                 @Override
                 public void onStatusChanged(String provider, int status, Bundle extras) {
-
+                    Toast.makeText(epicMap, "onStatusChanged", Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
                 public void onProviderEnabled(String provider) {
-
+                    Toast.makeText(epicMap, "onProviderEnabled", Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
                 public void onProviderDisabled(String provider) {
-
+                    Toast.makeText(epicMap, "onProviderDisabled", Toast.LENGTH_SHORT).show();
+                    epicMap.disableGPS();
                 }
             });
         }

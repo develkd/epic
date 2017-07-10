@@ -24,6 +24,7 @@ public interface Constants {
         NEW,
         UPDATED,
         CAMERA,
+        GPS_ACTIVATED,
         NO_RESULT_CHECK,
 
         ;

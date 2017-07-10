@@ -57,13 +57,11 @@ public class GpsService {
 
                 @Override
                 public void doPostiveOnClickHandling() {
-                    Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                    epicMap.startActivity(intent);
+                    epicMap.activateGPS();
                 }
 
                 @Override
                 public void doNegativeOnClickHandling() {
-                    epicMap.setDummyLocation(true);
                 }
             });
 
@@ -72,8 +70,9 @@ public class GpsService {
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!locationService.checkLocationPermission(epicMap)) {
                 Toast.makeText(epicMap, "No permission for GPS found", Toast.LENGTH_LONG).show();
+                return false;
             }
-            return false;
+            return true;
         }
         return enabaled;
     }
