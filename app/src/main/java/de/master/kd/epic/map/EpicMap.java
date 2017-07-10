@@ -6,14 +6,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
@@ -38,11 +42,16 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.IOException;
+import java.util.List;
+
 import de.master.kd.epic.R;
 import de.master.kd.epic.domain.interfaces.PositionService;
 import de.master.kd.epic.domain.position.Position;
 import de.master.kd.epic.infomessage.AlertDialogMessageConfigurator;
 import de.master.kd.epic.infomessage.InfoMessage;
+import de.master.kd.epic.map.interfaces.GpsService;
+import de.master.kd.epic.map.interfaces.LocationHandler;
 import de.master.kd.epic.map.interfaces.LocationService;
 import de.master.kd.epic.map.interfaces.MenuBuilderService;
 import de.master.kd.epic.map.interfaces.MenuItemHandler;
@@ -57,7 +66,7 @@ import de.master.kd.epic.utils.StringUtils;
  * Created by pentax on 28.06.17.
  */
 
-public class EpicMap extends FragmentActivity implements OnMapReadyCallback, LocationListener, MenuItemHandler {
+public class EpicMap extends FragmentActivity implements OnMapReadyCallback, MenuItemHandler {
     private GoogleMap googleMap;
 
     private LatLngHolder holder = new LatLngHolder();
@@ -68,80 +77,88 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Loc
     private FloatingActionButton markerBtn;
     private Marker selectedMarker;
     private boolean isLocationEventAvailable;
+    private LocationService locationService;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.map_layout);
-        setUpMapIfNeeded();
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.epic_map);
+        mapFragment.getMapAsync(this);
+        createLocationManager();
+
+        markerBtn = (FloatingActionButton) findViewById(R.id.select_point);
+        markerBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                markPosition(view);
+            }
+        });
+
         menuBuilder = new MenuBuilderService(this);
+
     }
 
-
-
-    public void onMapReady(final GoogleMap map) {
-        this.googleMap = map;
-        checkGpsStatus();
-        setUpMap();
-        //Initialize Google Play Services
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(this,
-                    Manifest.permission.ACCESS_FINE_LOCATION)
-                    == PackageManager.PERMISSION_GRANTED) {
-                buildGoogleApiClient();
-                googleMap.setMyLocationEnabled(true);
-            }
-        } else {
-            buildGoogleApiClient();
-            googleMap.setMyLocationEnabled(true);
-        }
-        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+    private void createLocationManager() {
+        locationService = new LocationService();
+        locationService.createLocationManager(this, new LocationHandler() {
             @Override
-            public boolean onMarkerClick(Marker marker) {
-                Projection projection = googleMap.getProjection();
-                selectedMarker = marker;
-                // Point screenPosition = projection.toScreenLocation(selectedMarkerLongLat);
-                //  Toast.makeText(EpicMap.this, "screenPosition =  " + screenPosition, Toast.LENGTH_LONG).show();
-                menuBuilder.toggleMenuVisibilty();
-                return false;
+            public void processLocationEvent(Location location) {
+                doLocate(location);
             }
         });
     }
 
 
+    public void onMapReady(final GoogleMap map) {
+        this.googleMap = map;
 
-    @Override
-    public void onLocationChanged(Location aLocation) {
-        //Place current location marker
-        isLocationEventAvailable = true;
-        this.location = new LatLng(aLocation.getLatitude(), aLocation.getLongitude());
-        //move map camera
-        //googleMap.moveCamera(CameraUpdateFactory.newLatLng(this.location));
-        LatLngBounds bounds = new LatLngBounds.Builder().include(location).build();
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 10));
-        googleMap.animateCamera(CameraUpdateFactory.zoomTo(10));
 
-//        //stop location updates
-//        if (googleApiClient != null) {
-//            LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
-//        }
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        googleMap.setMyLocationEnabled(true);
+        checkGpsStatus();
+        //  setUpMap();
+        //Initialize Google Play Services
+//        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            if (ContextCompat.checkSelfPermission(this,
+//                    Manifest.permission.ACCESS_FINE_LOCATION)
+//                    == PackageManager.PERMISSION_GRANTED) {
+//                buildGoogleApiClient();
+//                googleMap.setMyLocationEnabled(true);
+//            }
+//        } else {
+        buildGoogleApiClient();
 
+/* } */
+        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                Projection projection = googleMap.getProjection();
+                selectedMarker = marker;
+                menuBuilder.toggleMenuVisibilty(true);
+                return false;
+            }
+        });
     }
 
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-        Toast.makeText(this, "Statusänderung erkannt", Toast.LENGTH_LONG).show();
+    private void checkGpsStatus() {
+        GpsService service = new GpsService(this);
+        service.isGpsEnabled();
     }
 
-    @Override
-    public void onProviderEnabled(String provider) {
-        Toast.makeText(this, "GPS ist aktiviert", Toast.LENGTH_LONG).show();
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-        Toast.makeText(this, "GPS ist deaktiviert", Toast.LENGTH_LONG).show();
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -161,7 +178,6 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Loc
     }
 
 
-
     @Override
     public Activity getImplementer() {
         return this;
@@ -169,7 +185,7 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Loc
 
     @Override
     public void doHandleActionEvent(Constants.REQUEST request, Constants.RESULT result) {
-        if(null == selectedMarker){
+        if (null == selectedMarker) {
             Toast.makeText(this, "Kein Marker vorhanden oder ausgewählt", Toast.LENGTH_LONG).show();
             return;
         }
@@ -187,88 +203,39 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Loc
                 break;
 
             default:
-                throw  new IllegalArgumentException("Requesttype "+request+" not supported yet");
+                throw new IllegalArgumentException("Requesttype " + request + " not supported yet");
         }
 
     }
     //-------------------------- HELPERS -------------------------------------------------
 
-    private void setUpMap() {
-        final View mapView = getSupportFragmentManager().findFragmentById(R.id.epic_map).getView();
-        if (mapView.getViewTreeObserver().isAlive()) {
-            mapView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                // We check which build version we are using.
-                @Override
-                public void onGlobalLayout() {
-                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-                        mapView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                    } else {
-                        mapView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                    }
-                }
-            });
-        }
-    }
+//    private void setUpMap() {
+//        final View mapView = getSupportFragmentManager().findFragmentById(R.id.epic_map).getView();
+//        if (mapView.getViewTreeObserver().isAlive()) {
+//            mapView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+//                // We check which build version we are using.
+//                @Override
+//                public void onGlobalLayout() {
+//                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+//                        mapView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+//                    } else {
+//                        mapView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+//                    }
+//                }
+//            });
+//        }
+//    }
 
-    private void setUpMapIfNeeded() {
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.epic_map);
-        mapFragment.getMapAsync(this);
 
-        markerBtn = (FloatingActionButton) findViewById(R.id.select_point);
-        markerBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                markPosition(view);
-            }
-        });
-
+    private void doLocate(Location aLocation) {
+        isLocationEventAvailable = true;
+        location = new LatLng(aLocation.getLatitude(), aLocation.getLongitude());
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 16.2f));
+        googleMap.animateCamera(CameraUpdateFactory.zoomTo(16.2f));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(location));
     }
 
 
-    private void checkGpsStatus() {
-        LocationService locationService = new LocationService(this);
-        if (!locationService.isGpsEnabled()) {
-            InfoMessage.showAllertDialog(this, new AlertDialogMessageConfigurator() {
-                @Override
-                public String getTitle() {
-                    return "GPS-Einstellungen";
-                }
-
-                @Override
-                public String getMessage() {
-                    return "GPS ist nicht aktive. Möchten Sie das GPS aktivieren?";
-                }
-
-                @Override
-                public String getPositiveButtonName() {
-                    return "Aktivieren";
-                }
-
-                @Override
-                public String getNegativeButtonName() {
-                    return "Abbrechen";
-                }
-
-                @Override
-                public void doPostiveOnClickHandling() {
-                    Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                    EpicMap.this.startActivity(intent);
-                }
-
-                @Override
-                public void doNegativeOnClickHandling() {
-                    setDummyLocation(true);
-                }
-            });
-
-        }
-
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!locationService.checkLocationPermission(EpicMap.this)) {
-                Toast.makeText(this, "No permission for GPS found", Toast.LENGTH_LONG).show();
-            }
-        }
-    }
 
 
     private void markPosition(View view) {
@@ -340,7 +307,7 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Loc
 
 
 
-    private void setDummyLocation(boolean odd) {
+    public void setDummyLocation(boolean odd) {
         if (!isLocationEventAvailable) {
             location = odd ? holder.next() : holder.before();
         }
@@ -415,12 +382,20 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Loc
 //                + "," + longitude;
 //        startActivity(new Intent(android.content.Intent.ACTION_VIEW,
 //                Uri.parse(uri)));
+        Geocoder geocoder = new Geocoder(getApplicationContext());
+        String pos = "";
+        try {
+            List<Address> adds =  geocoder.getFromLocation(location.latitude, location.longitude, 1 );
+            pos = adds.get(0).getLocality()+" "+adds.get(0).getCountryName();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         String uri = "http://maps.google.com/maps?saddr=" +location.latitude+","+location.longitude;
         Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
         sharingIntent.setType("text/plain");
-        String ShareSub = "Here is my location";
-        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, selectedMarker.getTitle());
+        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, selectedMarker.getTitle()+": "+pos);
         sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT,  uri);
         startActivity(Intent.createChooser(sharingIntent, "Share via"));
 

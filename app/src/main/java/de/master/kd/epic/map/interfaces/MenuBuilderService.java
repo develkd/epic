@@ -17,7 +17,6 @@ public class MenuBuilderService {
 
     private FloatingActionButton edit_item, route_item, snych_item, trash_item, share_item;
     private Animation showMenu, hideMenu;
-    private boolean isOpen = false;
     private MenuItemHandler handler;
     private Activity activity;
     // PopupMenu popupMenu;
@@ -47,12 +46,9 @@ public class MenuBuilderService {
 
     }
 
-    public void toggleMenuVisibilty() {
-        animateMenuItems(isOpen);
-        enableClickEvent(isOpen);
-
-        isOpen = !isOpen;
-
+    public void toggleMenuVisibilty(boolean show) {
+        animateMenuItems(show);
+        enableClickEvent(show);
     }
 
     private void animateMenuItems(boolean show) {
@@ -79,7 +75,7 @@ public class MenuBuilderService {
         edit_item.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                toggleMenuVisibilty();
+                toggleMenuVisibilty(false);
                 handler.doHandleActionEvent(Constants.REQUEST.EDIT, Constants.RESULT.UPDATED);
             }
         });
@@ -91,7 +87,7 @@ public class MenuBuilderService {
         edit_item.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                toggleMenuVisibilty();
+                toggleMenuVisibilty(false);
                 handler.doHandleActionEvent(Constants.REQUEST.DELETE, Constants.RESULT.NO_RESULT_CHECK);
             }
         });
@@ -103,7 +99,7 @@ public class MenuBuilderService {
         edit_item.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                toggleMenuVisibilty();
+                toggleMenuVisibilty(false);
                 handler.doHandleActionEvent(Constants.REQUEST.SHARE, Constants.RESULT.NO_RESULT_CHECK);
             }
         });

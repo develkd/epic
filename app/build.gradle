@@ -23,10 +23,7 @@ android {
         enabled = true
     }
 
-
 }
-
-
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
