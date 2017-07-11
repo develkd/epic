@@ -96,8 +96,10 @@ public class PositionEditActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         Bundle extras = data.getExtras();
         bitmap = (Bitmap) extras.get("data");
-        assert null != bitmap;
-        imageView.setImageBitmap(PictureService.resizeBitmap(bitmap, 100, 100));
+       if(null == bitmap) {
+           return;
+       }
+        imageView.setImageBitmap(PictureService.fitBitmapIn(bitmap));
     }
 
 

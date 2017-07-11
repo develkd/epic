@@ -6,6 +6,8 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -38,14 +40,23 @@ public class PictureService {
         return bitmap;
     }
 
+
+    public static Bitmap fitBitmapIn(final Bitmap srcBitmap) {
+        return resizeBitmap(srcBitmap, srcBitmap.getWidth(), srcBitmap.getHeight());
+    }
+
     public static Bitmap resizeBitmap(final Bitmap srcBitmap, int width, int height) {
-        Bitmap output = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(output);
         Matrix m = new Matrix();
         m.setScale((float) width / srcBitmap.getWidth(), (float) height / srcBitmap.getHeight());
-        canvas.drawBitmap(srcBitmap, m, new Paint());
 
+        Bitmap output = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(output);
+        canvas.rotate(90,canvas.getWidth()/2,canvas.getHeight()/2);
+        canvas.drawBitmap(srcBitmap, m, new Paint());
         return output;
+
     }
+
 
 }
