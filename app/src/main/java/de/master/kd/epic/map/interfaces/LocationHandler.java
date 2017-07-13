@@ -8,5 +8,5 @@ import android.location.Location;
 
 public interface LocationHandler {
 
-    void processLocationEvent(Location location);
+    void processEvent(Location location);
 }

@@ -2,26 +2,17 @@ package de.master.kd.epic.map.interfaces;
 
 import android.Manifest;
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.model.LatLng;
-
-import de.master.kd.epic.infomessage.AlertDialogMessageConfigurator;
-import de.master.kd.epic.infomessage.InfoMessage;
 import de.master.kd.epic.map.EpicMap;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
@@ -35,9 +26,12 @@ public class LocationService {
     private LocationManager locationManager;
 
 
-//    public boolean isGpsEnabled() {
-//        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-//    }
+    public LocationManager getLocationManager(EpicMap epicMap){
+        if(null == locationManager){
+            locationManager = (LocationManager) epicMap.getSystemService(Context.LOCATION_SERVICE);
+        }
+        return locationManager;
+    }
 
 
     public Boolean checkLocationPermission(EpicMap activity) {
@@ -59,38 +53,25 @@ public class LocationService {
                 setRequestedPermissions(activity);
                 return false;
             }
-          //  locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0,  activity);
+            //  locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0,  activity);
         }
         return true;
 
     }
 
 
-    private void setRequestedPermissions(EpicMap activity){
-        ActivityCompat.requestPermissions(activity,
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                EPIC_LOCATION_PERMISSIONS_REQUEST);
+    public void processLocationEvent(final EpicMap epicMap, final LocationHandler locationHandler) {
+         locationManager = getLocationManager(epicMap);
+
+        if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+           doNetworkRequest(epicMap, locationHandler);
+        } else if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            doGpsRequest(epicMap);
+
+        }
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
-    private boolean hasAccessToFineLocationOnSelf(FragmentActivity activity){
-        return PERMISSION_GRANTED == activity.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
-    }
-
-    @TargetApi(Build.VERSION_CODES.M)
-    private boolean hasAccessToFineLocationOnAcitity(FragmentActivity activity){
-        return PERMISSION_GRANTED == activity.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
-    }
-
-    @TargetApi(Build.VERSION_CODES.M)
-    private boolean hasAccessToCoarseLocation(FragmentActivity activity){
-        return PERMISSION_GRANTED == ActivityCompat.checkSelfPermission(activity,
-                Manifest.permission.ACCESS_COARSE_LOCATION);
-    }
-
-
-    public  void createLocationManager(final EpicMap epicMap, final LocationHandler locationHandler) {
-        locationManager = (LocationManager) epicMap.getSystemService(Context.LOCATION_SERVICE);
+    private void doGpsRequest(final EpicMap epicMap) {
         if (ActivityCompat.checkSelfPermission(epicMap,
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(epicMap,
@@ -104,52 +85,89 @@ public class LocationService {
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                epicMap.doLocate(location);
+            }
 
-        if(locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, new LocationListener() {
-                @Override
-                public void onLocationChanged(Location location) {
-                    locationHandler.processLocationEvent(location);
-                }
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+                Toast.makeText(epicMap, "onStatusChanged", Toast.LENGTH_SHORT).show();
+            }
 
-                @Override
-                public void onStatusChanged(String provider, int status, Bundle extras) {
-                    Toast.makeText(epicMap, "onStatusChanged", Toast.LENGTH_SHORT).show();
-                }
+            @Override
+            public void onProviderEnabled(String provider) {
+                Toast.makeText(epicMap, "onProviderEnabled", Toast.LENGTH_SHORT).show();
+            }
 
-                @Override
-                public void onProviderEnabled(String provider) {
-                    Toast.makeText(epicMap, "onProviderEnabled", Toast.LENGTH_SHORT).show();
-                }
-
-                @Override
-                public void onProviderDisabled(String provider) {
-                    Toast.makeText(epicMap, "onProviderDisabled", Toast.LENGTH_SHORT).show();
-                }
-            });
-        }else if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, new LocationListener() {
-                @Override
-                public void onLocationChanged(Location location) {
-                    locationHandler.processLocationEvent(location);
-                }
-
-                @Override
-                public void onStatusChanged(String provider, int status, Bundle extras) {
-                    Toast.makeText(epicMap, "onStatusChanged", Toast.LENGTH_SHORT).show();
-                }
-
-                @Override
-                public void onProviderEnabled(String provider) {
-                    Toast.makeText(epicMap, "onProviderEnabled", Toast.LENGTH_SHORT).show();
-                }
-
-                @Override
-                public void onProviderDisabled(String provider) {
-                    Toast.makeText(epicMap, "onProviderDisabled", Toast.LENGTH_SHORT).show();
-                    epicMap.disableGPS();
-                }
-            });
-        }
+            @Override
+            public void onProviderDisabled(String provider) {
+                Toast.makeText(epicMap, "onProviderDisabled", Toast.LENGTH_SHORT).show();
+                epicMap.disableGPS();
+            }
+        });
     }
+
+
+    private void doNetworkRequest(final EpicMap epicMap, final LocationHandler locationHandler){
+        if (ActivityCompat.checkSelfPermission(epicMap,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(epicMap,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                locationHandler.processEvent(location);
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+                Toast.makeText(epicMap, "onStatusChanged", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+                Toast.makeText(epicMap, "onProviderEnabled", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+                Toast.makeText(epicMap, "onProviderDisabled", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void setRequestedPermissions(EpicMap activity) {
+        ActivityCompat.requestPermissions(activity,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                EPIC_LOCATION_PERMISSIONS_REQUEST);
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private boolean hasAccessToFineLocationOnSelf(FragmentActivity activity) {
+        return PERMISSION_GRANTED == activity.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private boolean hasAccessToFineLocationOnAcitity(FragmentActivity activity) {
+        return PERMISSION_GRANTED == activity.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private boolean hasAccessToCoarseLocation(FragmentActivity activity) {
+        return PERMISSION_GRANTED == ActivityCompat.checkSelfPermission(activity,
+                Manifest.permission.ACCESS_COARSE_LOCATION);
+    }
+
+
 }

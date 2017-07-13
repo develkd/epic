@@ -16,22 +16,22 @@ import de.master.kd.epic.map.EpicMap;
  */
 
 public class GpsService {
-    private LocationManager locationManager;
     private EpicMap epicMap;
     private LocationService locationService;
-    public GpsService(EpicMap epicMap){
+
+    public GpsService(EpicMap epicMap) {
         this.epicMap = epicMap;
-        locationManager = (LocationManager) epicMap.getSystemService(Context.LOCATION_SERVICE);
         locationService = new LocationService();
     }
 
 
     public boolean isGpsEnabled() {
-        return checkGpsStatus(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER));
+        return checkGpsStatus(locationService.getLocationManager(epicMap)
+                .isProviderEnabled(LocationManager.GPS_PROVIDER));
     }
 
 
-        private boolean checkGpsStatus(boolean enabaled) {
+    private boolean checkGpsStatus(boolean enabaled) {
 
         if (!enabaled) {
             InfoMessage.showAllertDialog(epicMap, new AlertDialogMessageConfigurator() {
