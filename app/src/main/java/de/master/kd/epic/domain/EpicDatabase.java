@@ -12,10 +12,10 @@ import de.master.kd.epic.domain.position.PositionTabel;
 
 public class EpicDatabase extends SQLiteOpenHelper{
 
-
-    public static final String DB_NAME="de.master.kd.epic.db";
-    public static final int DB_VERSION=1;
     public static String TABLE_POSITION = PositionTabel.TABLE;
+    public static final String DB_NAME="de.master.kd.epic.sql.db";
+    public static final int DB_VERSION=1;
+
 
 
 
@@ -25,13 +25,12 @@ public class EpicDatabase extends SQLiteOpenHelper{
 
     @Override
     public void onCreate(SQLiteDatabase db){
-        db.execSQL(PositionTabel.getTableDescription());
-
+        db.execSQL(PositionTabel.getCreateTableDescription());
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion){
-        db.execSQL("DROP TABLE IF EXISTS "+ TABLE_POSITION);
+        db.execSQL(PositionTabel.getDropTableDescription());
         onCreate(db);
     }
 

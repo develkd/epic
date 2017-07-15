@@ -13,6 +13,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.GoogleMap;
+
 import de.master.kd.epic.map.EpicMap;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
@@ -26,8 +28,8 @@ public class LocationService {
     private LocationManager locationManager;
 
 
-    public LocationManager getLocationManager(EpicMap epicMap){
-        if(null == locationManager){
+    public LocationManager getLocationManager(EpicMap epicMap) {
+        if (null == locationManager) {
             locationManager = (LocationManager) epicMap.getSystemService(Context.LOCATION_SERVICE);
         }
         return locationManager;
@@ -40,16 +42,7 @@ public class LocationService {
             return false;
         } else {
             if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                    && !hasAccessToCoarseLocation(activity)) {
-
-
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
+                   && !hasAccessToCoarseLocation(activity)) {
                 setRequestedPermissions(activity);
                 return false;
             }
@@ -60,11 +53,21 @@ public class LocationService {
     }
 
 
+    public void checkLocationPermission(GoogleMap map, EpicMap epic) {
+        if (ActivityCompat.checkSelfPermission(epic,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(epic,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            setRequestedPermissions(epic);
+        }
+        map.setMyLocationEnabled(true);
+    }
+
     public void processLocationEvent(final EpicMap epicMap, final LocationHandler locationHandler) {
-         locationManager = getLocationManager(epicMap);
+        locationManager = getLocationManager(epicMap);
 
         if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-           doNetworkRequest(epicMap, locationHandler);
+            doNetworkRequest(epicMap, locationHandler);
         } else if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             doGpsRequest(epicMap);
 
@@ -76,13 +79,7 @@ public class LocationService {
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(epicMap,
                 Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
+
             return;
         }
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, new LocationListener() {
@@ -110,18 +107,12 @@ public class LocationService {
     }
 
 
-    private void doNetworkRequest(final EpicMap epicMap, final LocationHandler locationHandler){
+    private void doNetworkRequest(final EpicMap epicMap, final LocationHandler locationHandler) {
         if (ActivityCompat.checkSelfPermission(epicMap,
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(epicMap,
                 Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
+            setRequestedPermissions(epicMap);
             return;
         }
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, new LocationListener() {
@@ -149,7 +140,9 @@ public class LocationService {
 
     private void setRequestedPermissions(EpicMap activity) {
         ActivityCompat.requestPermissions(activity,
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION},
                 EPIC_LOCATION_PERMISSIONS_REQUEST);
     }
 

@@ -1,10 +1,8 @@
 package de.master.kd.epic.domain.position;
 
 import android.databinding.BaseObservable;
-import android.databinding.Bindable;
 import android.provider.BaseColumns;
 
-import com.google.android.gms.maps.model.LatLng;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -17,25 +15,14 @@ public class Position extends BaseObservable implements BaseColumns, Serializabl
 
 
     private Long id;
-
-    @Bindable
     private String title;
-
-    @Bindable
     private String description;
-
     private Double latitude;
-
     private Double longitude;
-
     private String pathMap;
-
     private String pathPicture;
-
     private Date createDate;
-
     private Date updateDate;
-
     private Long markerId;
 
 

@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import com.google.android.gms.maps.model.LatLng;
 
 import de.master.kd.epic.R;
+import de.master.kd.epic.domain.interfaces.PositionRepository;
 import de.master.kd.epic.domain.position.Position;
 import de.master.kd.epic.domain.interfaces.PositionService;
 import de.master.kd.epic.map.EpicMap;
@@ -25,12 +26,13 @@ public class PositionEditActivity extends AppCompatActivity {
     private ImageView imageView;
     private FloatingActionButton postionSave;
     private Bitmap bitmap;
+    private PositionService service;
     private Position actualPosition;
-
     @Override
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         setContentView(R.layout.activity_postion_edit);
+        service = new PositionService(this);
 
         imageView = (ImageView) findViewById(R.id.imageViewCamera);
         imageView.setOnClickListener(new View.OnClickListener() {
@@ -52,9 +54,6 @@ public class PositionEditActivity extends AppCompatActivity {
 
     private void addPostionData() {
         actualPosition = getPositionFromIntent();
-        if(null == actualPosition){
-            return;
-        }
 
         EditText text = (EditText) findViewById(R.id.titleField);
         EditText describe = (EditText) findViewById(R.id.describeField);
@@ -67,7 +66,7 @@ public class PositionEditActivity extends AppCompatActivity {
         if (bundle != null) {
             LatLng latLng = (LatLng) bundle.get(Constants.PARAMETER.LOCATION.name());
             if (null != latLng) {
-                return PositionService.findPositionBy(latLng);
+                return service.findPositionBy(latLng);
             }
         }
         return null;
@@ -84,7 +83,8 @@ public class PositionEditActivity extends AppCompatActivity {
     }
 
     private Constants.RESULT getResultType(){
-        return null == actualPosition ? Constants.RESULT.NEW : Constants.RESULT.UPDATED;
+        Bundle bundle = getIntent().getExtras();
+        return (Constants.RESULT) bundle.get(Constants.PARAMETER.POSITION_ID.name());
     }
     public void doSnapShot(View view) {
         Intent intent_picture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -104,13 +104,16 @@ public class PositionEditActivity extends AppCompatActivity {
 
 
     private Position callPersistPositionService() {
-        EditText text = (EditText) findViewById(R.id.titleField);
-        EditText describe = (EditText) findViewById(R.id.describeField);
         Bundle bundle = getIntent().getExtras();
         LatLng latLng = (LatLng) bundle.get(Constants.PARAMETER.LOCATION.name());
-        String posId = (String) bundle.get(Constants.PARAMETER.POSITION_ID.name());
-        // Position actualPosition = PositionService.findPositionBy(latLng);
-        return PositionService.save(actualPosition,String.valueOf(text.getText()), String.valueOf(describe.getText()), latLng, null, null);
+
+        EditText title = (EditText) findViewById(R.id.titleField);
+        EditText describe = (EditText) findViewById(R.id.describeField);
+        actualPosition.setTitle(title.getText().toString());
+        actualPosition.setDescription(describe.toString());
+        actualPosition.setLatitude(latLng.latitude);
+        actualPosition.setLongitude(latLng.longitude);
+        return service.save(actualPosition);
 
     }
 }

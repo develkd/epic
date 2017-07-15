@@ -1,11 +1,15 @@
 package de.master.kd.epic.domain.interfaces;
 
+import android.content.Context;
+
 import com.google.android.gms.maps.model.LatLng;
 
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+import de.master.kd.epic.domain.EpicDatabase;
 import de.master.kd.epic.domain.position.Position;
 
 /**
@@ -13,52 +17,29 @@ import de.master.kd.epic.domain.position.Position;
  */
 
 public class PositionService {
-    private static final PositionRepository service = new PositionRepository();
+    private  final PositionRepository repro;
 
-    private PositionService() {
+    public PositionService(Context context) {
+        repro = new PositionRepository(context);
     }
 
 
-    public static Position save(final Position currentPosition, String title, String description, LatLng latLng, String pathPicture, String pathMap) {
-        Position position = currentPosition;
-        if (null == currentPosition) {
-            position = new Position();
-            position.setId(new Date().getTime());
-        }
-        position.setTitle(title);
-        position.setDescription(description);
-        position.setLatitude(latLng.latitude);
-        position.setLongitude(latLng.longitude);
-        position.setPathPicture(pathPicture);
-        position.setPathMap(pathMap);
 
-        service.save(position);
-        return position;
+    public  Position save(final Position position) {
+        return repro.save(position);
     }
 
 
-    public static ArrayList<Position> getPositions() {
-        return service.getAllPositions();
+
+    public  List<Position> getPositions() {
+        return repro.getAllPositions();
     }
 
-    public static Position findPositionBy(LatLng latLng) {
-        double lon = latLng.longitude;
-        double lat = latLng.latitude;
-
-        for (Position p : service.getAllPositions()) {
-            if (p.getLatitude() == lat && p.getLongitude() == lon) {
-                return p;
-            }
-        }
-        return null;
+    public  Position findPositionBy(LatLng latLng) {
+        return new Position();
     }
 
-    public static void remove(LatLng position) {
-        Position p = findPositionBy(position);
-        if(null == p){
-            return;
-        }
+    public  void remove(LatLng latLng) {
 
-        getPositions().remove(p);
     }
 }

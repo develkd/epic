@@ -23,4 +23,9 @@ public class StringUtils {
 
         return value;
     }
+
+    public static boolean isEmpty(String value){
+        return (null == value || value.trim().length() == 0);
+    }
+
 }

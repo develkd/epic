@@ -31,6 +31,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -70,12 +71,13 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
     private boolean firstEntry = true;
     private float actuallZoomLevel = 16.2f;
     private GpsService gpsService;
-
+    private PositionService service;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.map_layout);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.epic_map);
+
         mapFragment.getMapAsync(this);
 
         markerBtn = (FloatingActionButton) findViewById(R.id.select_point);
@@ -90,29 +92,15 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
 
         buildGoogleApiClient();
         gpsService = new GpsService(this);
+        service = new PositionService(this);
     }
 
 
     public void onMapReady(final GoogleMap map) {
         this.googleMap = map;
 
+        locationService.checkLocationPermission(googleMap,this);
 
-        if (ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-
-
-        googleMap.setMyLocationEnabled(true);
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
@@ -129,15 +117,16 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
                 if (firstEntry) {
                     return;
                 }
-
                 actuallZoomLevel = googleMap.getCameraPosition().zoom;
             }
         });
 
 
         gpsService.isGpsEnabled();
+        setExistingMarker();
         addLocationService();
     }
+
 
 
     @Override
@@ -228,6 +217,7 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
 
         Intent position = new Intent(EpicMap.this, PositionEditActivity.class);
         position.putExtra(Constants.PARAMETER.LOCATION.name(), location);
+        position.putExtra(Constants.PARAMETER.POSITION_ID.name(), Constants.RESULT.NEW);
         startActivityForResult(position, Constants.RESULT.NEW.ordinal());
         //https://www.androidtutorialpoint.com/intermediate/android-map-app-showing-current-location-android/
     }
@@ -238,8 +228,8 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
         return p;
     }
 
-    private View getPictureLayout(Bundle bundle) {
-        Bitmap bitmap = (Bitmap) bundle.get(Constants.PARAMETER.PICTURE.name());
+    private View getPictureLayout(Bitmap bitmap) {
+
         View layout = getMarkerLayout();
         ImageView view = (ImageView) layout.findViewById(R.id.bmp_view);
         if (null != bitmap) {
@@ -253,34 +243,52 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
         return ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.custom_marker_layout, null);
     }
 
+    private void setExistingMarker() {
+        for (Position position:service.getPositions()) {
+            MarkerOptions mops = createMarkerWith(position);
+            googleMap.addMarker(mops);
+        }
+    }
+
     private void addNewMapMarker(Intent data) {
         if (null == data) {
             return;
         }
 
         Bundle bundle = data.getExtras();
+        Bitmap bitmap = (Bitmap) bundle.get(Constants.PARAMETER.PICTURE.name());
         Position p = getIntendedPosition(bundle);
-        View layout = getPictureLayout(bundle);
+        View layout = getPictureLayout(bitmap);
+        MarkerOptions mops = createMarkerWith(p);
+        mops.icon(addBitmaptToMarker(layout));
 
-        Marker marker = googleMap.addMarker(new MarkerOptions()
-                .position(Converter.toLatLang(p.getLatitude(), p.getLongitude()))
-                .title(p.getTitle())
-                .snippet(StringUtils.cut(p.getDescription(), p.getTitle().length()))
-                .icon(BitmapDescriptorFactory.fromBitmap(PictureService.createBitmap(this, layout))));
-
+        googleMap.addMarker(mops);
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(location));
 
     }
 
 
+    private  MarkerOptions createMarkerWith(Position p){
+      MarkerOptions mops = new MarkerOptions()
+                .position(Converter.toLatLang(p.getLatitude(), p.getLongitude()))
+                .title(p.getTitle())
+                .snippet(StringUtils.cut(p.getDescription(), p.getTitle().length()));
+
+        return mops;
+    }
+
+    private BitmapDescriptor addBitmaptToMarker(View layout){
+        return BitmapDescriptorFactory.fromBitmap(PictureService.createBitmap(this, layout));
+    }
     private void updateMapMarker(Intent data) {
         if (null == data) {
             return;
         }
 
         Bundle bundle = data.getExtras();
+        Bitmap bitmap = (Bitmap) bundle.get(Constants.PARAMETER.PICTURE.name());
         Position p = getIntendedPosition(bundle);
-        View layout = getPictureLayout(bundle);
+        View layout = getPictureLayout(bitmap);
 
         selectedMarker.setTitle(p.getTitle());
         selectedMarker.setSnippet(StringUtils.cut(p.getDescription(), p.getTitle().length()));
@@ -328,7 +336,7 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
     private void deleteMapMarker() {
 
         selectedMarker.remove();
-        PositionService.remove(selectedMarker.getPosition());
+        service.remove(selectedMarker.getPosition());
         selectedMarker = null;
     }
 

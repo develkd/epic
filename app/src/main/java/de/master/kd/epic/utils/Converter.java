@@ -22,8 +22,16 @@ public class Converter {
         return dateFormat.format(date);
     }
 
-    public static Date toDate(String date) throws ParseException{
-            return dateFormat.parse(date);
+    public static Date toDate(String value) {
+        Date date = null;
+        if(!StringUtils.isEmpty(value)){
+            try {
+                date = dateFormat.parse(value);
+            }catch (ParseException  nfe){
+                // NOP
+            }
+        }
+            return date;
     }
 
     public static final String toString(Double value){
@@ -31,7 +39,18 @@ public class Converter {
     }
 
     public static final Double toDouble(String value){
-        return Double.parseDouble(value);
+        Double dValue = null;
+        if(!StringUtils.isEmpty(value)){
+            try {
+                dValue = Double.parseDouble(value);
+            }catch (NumberFormatException  nfe){
+                // NOP
+            }
+        }
+
+
+
+        return dValue;
     }
 
 
