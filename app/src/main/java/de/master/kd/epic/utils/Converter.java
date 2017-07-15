@@ -13,7 +13,7 @@ import java.util.Locale;
  */
 
 public class Converter {
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY);
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH.mm.ss", Locale.GERMANY);
 
     private Converter() {
     }

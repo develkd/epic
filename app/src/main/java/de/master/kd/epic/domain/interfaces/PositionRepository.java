@@ -1,20 +1,13 @@
 package de.master.kd.epic.domain.interfaces;
 
-import android.app.Service;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.IBinder;
-import android.support.annotation.Nullable;
 
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -39,7 +32,7 @@ public class PositionRepository implements PositionCRUD {
     @Override
     public Position save(Position position) {
         SQLiteDatabase db = em.getWritableDatabase();
-        long id = db.insertWithOnConflict(PositionTabel.TABLE, null, creagteContentValues(position),
+        long id = db.insertWithOnConflict(PositionTabel.TABLE, null, createContentValues(position, true),
                 SQLiteDatabase.CONFLICT_REPLACE);
         db.close();
         position.setId(Long.valueOf(id));
@@ -49,7 +42,7 @@ public class PositionRepository implements PositionCRUD {
     @Override
     public Position update(Position position) {
         SQLiteDatabase db = em.getWritableDatabase();
-        long id = db.updateWithOnConflict(PositionTabel.TABLE, creagteContentValues(position),
+        long id = db.updateWithOnConflict(PositionTabel.TABLE, createContentValues(position, false),
                 PositionTabel._ID + " = ? ", new String[]{Converter.toString(position.getId())},
                 SQLiteDatabase.CONFLICT_REPLACE);
         db.close();
@@ -156,7 +149,7 @@ public class PositionRepository implements PositionCRUD {
         return p;
     }
 
-    private ContentValues creagteContentValues(Position position){
+    private ContentValues createContentValues(Position position, boolean create){
         ContentValues values = new ContentValues();
         values.put(PositionTabel.TITLE, position.getTitle());
         values.put(PositionTabel.DESCRIPTION, position.getDescription());
@@ -164,7 +157,13 @@ public class PositionRepository implements PositionCRUD {
         values.put(PositionTabel.LONGITUDE, Converter.toString(position.getLongitude()));
         values.put(PositionTabel.MAP_PATH, position.getPathMap());
         values.put(PositionTabel.PICTURE_PATH, position.getPathPicture());
-        values.put(PositionTabel.CREATE_DATE, Converter.toString(new Date()));
+
+        if(create){
+            values.put(PositionTabel.CREATE_DATE, Converter.toString(new Date()));
+        }else{
+            values.put(PositionTabel.UPDATE_DATE, Converter.toString(new Date()));
+        }
+
         return  values;
     }
 }
