@@ -28,70 +28,106 @@ import de.master.kd.epic.utils.Converter;
  * Created by pentax on 28.06.17.
  */
 
-public class PositionRepository  implements PositionCRUD{
+public class PositionRepository implements PositionCRUD {
     private EpicDatabase em;
 
-    public PositionRepository(Context context){
+    public PositionRepository(Context context) {
         em = new EpicDatabase(context);
     }
 
 
     @Override
     public Position save(Position position) {
-
         SQLiteDatabase db = em.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(PositionTabel.TITLE, position.getTitle());
-        values.put(PositionTabel.DESCRIPTION, position.getDescription());
-        values.put(PositionTabel.LATITUDE,  Converter.toString(position.getLatitude()));
-        values.put(PositionTabel.LONGITUDE,  Converter.toString(position.getLongitude()));
-        values.put(PositionTabel.MAP_PATH, position.getPathMap());
-        values.put(PositionTabel.PICTURE_PATH, position.getPathPicture());
-        values.put(PositionTabel.CREATE_DATE, Converter.toString(new Date()));
-
-        long id = db.insertWithOnConflict(PositionTabel.TABLE, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+        long id = db.insertWithOnConflict(PositionTabel.TABLE, null, creagteContentValues(position),
+                SQLiteDatabase.CONFLICT_REPLACE);
         db.close();
         position.setId(Long.valueOf(id));
         return position;
     }
 
     @Override
-    public void update(Position p) {
-        updateOrDelete(false, p);
+    public Position update(Position position) {
+        SQLiteDatabase db = em.getWritableDatabase();
+        long id = db.updateWithOnConflict(PositionTabel.TABLE, creagteContentValues(position),
+                PositionTabel._ID + " = ? ", new String[]{Converter.toString(position.getId())},
+                SQLiteDatabase.CONFLICT_REPLACE);
+        db.close();
+
+        return position;
+
+    }
+
+
+
+    @Override
+    public void delete(LatLng latLng) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(PositionTabel.LATITUDE).append(" = ? ");
+        builder.append(" AND ");
+        builder.append(PositionTabel.LONGITUDE).append(" = ? ");
+        SQLiteDatabase db = em.getWritableDatabase();
+
+        System.out.println("Position deleted with location: " + latLng);
+        db.delete(PositionTabel.TABLE, builder.toString(),
+                new String[]{Converter.toString(latLng.latitude),
+                Converter.toString(latLng.longitude)});
     }
 
     @Override
     public void delete(Position p) {
         SQLiteDatabase db = em.getWritableDatabase();
-        long id = p.getId();
-        System.out.println("Position deleted with id: " + id);
-        db.delete(PositionTabel.TABLE, PositionTabel._ID + " = " + id, null);
+        System.out.println("Position deleted with id: " + p.getId());
+        db.delete(PositionTabel.TABLE, PositionTabel._ID + " = ? ", new String[]{Converter.toString(p.getId())});
     }
 
     @Override
-    public Position find(String title) {
-        return findInList(null, title, null);
+    public Position findByTitle(String title) {
+        return null;
     }
 
     @Override
-    public Position find(Long id) {
-        return findInList(id, null, null);
+    public Position findById(Long id) {
+        SQLiteDatabase db = em.getReadableDatabase();
+        Cursor cursor = db.query(PositionTabel.TABLE,
+                PositionTabel.ALL_COLUMNS, PositionTabel._ID,
+                new String[]{Converter.toString(id),
+                        }, null, null, null);
+
+
+        List<Position> positions = exceuteQuery(cursor);
+        return positions.isEmpty() ? null : positions.get(0);
+
     }
 
     @Override
-    public Position find(LatLng latLng) {
-        return findInList(null, null, latLng);
+    public List<Position> findByLocation(LatLng latLng) {
+        SQLiteDatabase db = em.getReadableDatabase();
+
+        Cursor cursor = db.query(PositionTabel.TABLE,
+                PositionTabel.ALL_COLUMNS, " latitude = ? AND longitude = ? ",
+                new String[]{Converter.toString(latLng.latitude),
+                        Converter.toString(latLng.longitude)}, null, null, null);
+
+        return exceuteQuery(cursor);
     }
 
 
     @Override
     public List<Position> getAllPositions() {
         SQLiteDatabase db = em.getReadableDatabase();
-        List<Position> positions = new ArrayList<>();
+
 
         Cursor cursor = db.query(PositionTabel.TABLE,
                 PositionTabel.ALL_COLUMNS, null, null, null, null, null);
 
+
+        return exceuteQuery(cursor);
+    }
+
+
+    private List<Position> exceuteQuery(Cursor cursor){
+        List<Position> positions = new ArrayList<>();
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             Position position = createPosition(cursor);
@@ -100,25 +136,10 @@ public class PositionRepository  implements PositionCRUD{
         }
         // make sure to close the cursor
         cursor.close();
-        return positions;
+        return  positions;
     }
 
-
-    private void updateOrDelete(boolean delete, Position search) {
-
-    }
-
-    private void removeFromList(int index) {
-
-    }
-
-    private Position findInList(Long id, String text, LatLng latLng) {
-
-        return null;
-    }
-
-
-    private Position createPosition(Cursor cursor){
+    private Position createPosition(Cursor cursor) {
         Position p = new Position();
 
         p.setId(cursor.getLong(cursor.getColumnIndex(PositionTabel._ID)));
@@ -135,4 +156,15 @@ public class PositionRepository  implements PositionCRUD{
         return p;
     }
 
+    private ContentValues creagteContentValues(Position position){
+        ContentValues values = new ContentValues();
+        values.put(PositionTabel.TITLE, position.getTitle());
+        values.put(PositionTabel.DESCRIPTION, position.getDescription());
+        values.put(PositionTabel.LATITUDE, Converter.toString(position.getLatitude()));
+        values.put(PositionTabel.LONGITUDE, Converter.toString(position.getLongitude()));
+        values.put(PositionTabel.MAP_PATH, position.getPathMap());
+        values.put(PositionTabel.PICTURE_PATH, position.getPathPicture());
+        values.put(PositionTabel.CREATE_DATE, Converter.toString(new Date()));
+        return  values;
+    }
 }

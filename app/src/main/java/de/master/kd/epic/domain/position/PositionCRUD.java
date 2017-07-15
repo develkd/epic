@@ -12,13 +12,13 @@ public interface PositionCRUD {
 
     Position save(Position position);
 
-    void update(Position p);
+    Position update(Position p);
 
     void delete(Position p);
-
-    Position find(String title);
-    Position find(Long id);
-    Position find(LatLng latLng);
+    void delete(LatLng latLng);
+    Position findByTitle(String title);
+    Position findById(Long id);
+    List<Position> findByLocation(LatLng latLng);
 
     List<Position> getAllPositions();
 

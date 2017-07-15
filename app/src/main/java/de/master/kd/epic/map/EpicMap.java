@@ -215,10 +215,10 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
             return;
         }
 
-        Intent position = new Intent(EpicMap.this, PositionEditActivity.class);
-        position.putExtra(Constants.PARAMETER.LOCATION.name(), location);
-        position.putExtra(Constants.PARAMETER.POSITION_ID.name(), Constants.RESULT.NEW);
-        startActivityForResult(position, Constants.RESULT.NEW.ordinal());
+        Intent intent = new Intent(EpicMap.this, PositionEditActivity.class);
+        intent.putExtra(Constants.PARAMETER.LOCATION.name(), location);
+        intent.putExtra(Constants.PARAMETER.POSITION_ID.name(), Constants.RESULT.NEW);
+        startActivityForResult(intent, Constants.RESULT.NEW.ordinal());
         //https://www.androidtutorialpoint.com/intermediate/android-map-app-showing-current-location-android/
     }
 
@@ -239,14 +239,26 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
         return layout;
     }
 
+    private View getPictureLayout(String path) {
+
+        View layout = getMarkerLayout();
+        ImageView view = (ImageView) layout.findViewById(R.id.bmp_view);
+        if (null != path) {
+//            Bitmap b = PictureService.createMarkerIcon(bitmap);
+//            view.setImageBitmap(b);
+        }
+        return layout;
+    }
+
     private View getMarkerLayout() {
         return ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.custom_marker_layout, null);
     }
 
     private void setExistingMarker() {
         for (Position position:service.getPositions()) {
-            MarkerOptions mops = createMarkerWith(position);
-            googleMap.addMarker(mops);
+            MarkerOptions mops = createMarkerWith(position, getPictureLayout(position.getPathPicture()));
+            Marker marker = googleMap.addMarker(mops);
+            marker.setTag(position);
         }
     }
 
@@ -257,22 +269,23 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
 
         Bundle bundle = data.getExtras();
         Bitmap bitmap = (Bitmap) bundle.get(Constants.PARAMETER.PICTURE.name());
-        Position p = getIntendedPosition(bundle);
+        Position position = getIntendedPosition(bundle);
         View layout = getPictureLayout(bitmap);
-        MarkerOptions mops = createMarkerWith(p);
-        mops.icon(addBitmaptToMarker(layout));
+        MarkerOptions mops = createMarkerWith(position,layout);
 
-        googleMap.addMarker(mops);
+        Marker marker = googleMap.addMarker(mops);
+        marker.setTag(position);
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(location));
 
     }
 
 
-    private  MarkerOptions createMarkerWith(Position p){
+    private  MarkerOptions createMarkerWith(Position p, View layout){
       MarkerOptions mops = new MarkerOptions()
                 .position(Converter.toLatLang(p.getLatitude(), p.getLongitude()))
                 .title(p.getTitle())
-                .snippet(StringUtils.cut(p.getDescription(), p.getTitle().length()));
+                .snippet(StringUtils.cut(p.getDescription(), p.getTitle().length()))
+                .icon(addBitmaptToMarker(layout));
 
         return mops;
     }
@@ -334,22 +347,20 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
 
 
     private void deleteMapMarker() {
-
+        service.remove((Position) selectedMarker.getTag());
         selectedMarker.remove();
-        service.remove(selectedMarker.getPosition());
         selectedMarker = null;
     }
 
     private void handleEditRequest() {
         Intent intent = new Intent(EpicMap.this, PositionEditActivity.class);
-        intent.putExtra(Constants.PARAMETER.LOCATION.name(), selectedMarker.getPosition());
+        intent.putExtra(Constants.PARAMETER.POSITION.name(), (Position)selectedMarker.getTag());
+        intent.putExtra(Constants.PARAMETER.POSITION_ID.name(), Constants.RESULT.UPDATED);
         startActivityForResult(intent, Constants.RESULT.UPDATED.ordinal());
     }
 
 
     private void shareMapMarker() {
-
-
         LatLng location = selectedMarker.getPosition();
         Double latitude = location.latitude;
         Double longitude = location.longitude;

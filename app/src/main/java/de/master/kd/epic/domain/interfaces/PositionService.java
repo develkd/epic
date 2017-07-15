@@ -5,11 +5,8 @@ import android.content.Context;
 import com.google.android.gms.maps.model.LatLng;
 
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import de.master.kd.epic.domain.EpicDatabase;
 import de.master.kd.epic.domain.position.Position;
 
 /**
@@ -26,7 +23,10 @@ public class PositionService {
 
 
     public  Position save(final Position position) {
-        return repro.save(position);
+        if(null == position.getId()){
+            repro.save(position);
+        }
+        return repro.update(position);
     }
 
 
@@ -35,11 +35,20 @@ public class PositionService {
         return repro.getAllPositions();
     }
 
-    public  Position findPositionBy(LatLng latLng) {
+    public  Position find(Position position) {
         return new Position();
     }
 
-    public  void remove(LatLng latLng) {
+    public void remove(LatLng latLng) {
 
+        repro.delete(latLng);
+    }
+    public void remove(Position position) {
+        repro.delete(position);
+    }
+
+    public Position findPositionBy(LatLng latLng) {
+        List<Position> ps =  repro.findByLocation(latLng);
+       return ps.isEmpty() ? new Position() : ps.get(0);
     }
 }

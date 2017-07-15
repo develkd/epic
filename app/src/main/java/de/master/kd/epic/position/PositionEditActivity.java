@@ -12,6 +12,8 @@ import android.widget.ImageView;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.List;
+
 import de.master.kd.epic.R;
 import de.master.kd.epic.domain.interfaces.PositionRepository;
 import de.master.kd.epic.domain.position.Position;
@@ -62,14 +64,19 @@ public class PositionEditActivity extends AppCompatActivity {
     }
 
     private Position getPositionFromIntent() {
+        Position position = new Position();
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
-            LatLng latLng = (LatLng) bundle.get(Constants.PARAMETER.LOCATION.name());
-            if (null != latLng) {
-                return service.findPositionBy(latLng);
+           Constants.RESULT result = (Constants.RESULT) bundle.get(Constants.PARAMETER.POSITION_ID.name());
+            if(Constants.RESULT.UPDATED == result) {
+
+                Position pos = (Position) bundle.get(Constants.PARAMETER.POSITION.name());
+                if (null != pos) {
+                    position = pos;
+                }
             }
         }
-        return null;
+        return position;
     }
 
     private void doSave(View v) {
@@ -105,14 +112,14 @@ public class PositionEditActivity extends AppCompatActivity {
 
     private Position callPersistPositionService() {
         Bundle bundle = getIntent().getExtras();
-        LatLng latLng = (LatLng) bundle.get(Constants.PARAMETER.LOCATION.name());
+        Position pos = (Position) bundle.get(Constants.PARAMETER.POSITION.name());
 
         EditText title = (EditText) findViewById(R.id.titleField);
         EditText describe = (EditText) findViewById(R.id.describeField);
         actualPosition.setTitle(title.getText().toString());
-        actualPosition.setDescription(describe.toString());
-        actualPosition.setLatitude(latLng.latitude);
-        actualPosition.setLongitude(latLng.longitude);
+        actualPosition.setDescription(describe.getText().toString());
+        actualPosition.setLatitude(pos.getLatitude());
+        actualPosition.setLongitude(pos.getLongitude());
         return service.save(actualPosition);
 
     }
