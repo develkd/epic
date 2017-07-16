@@ -111,16 +111,28 @@ public class PositionEditActivity extends AppCompatActivity {
 
 
     private Position callPersistPositionService() {
-        Bundle bundle = getIntent().getExtras();
-        Position pos = (Position) bundle.get(Constants.PARAMETER.POSITION.name());
 
+        LatLng pos = getLocationFromIntent();
         EditText title = (EditText) findViewById(R.id.titleField);
         EditText describe = (EditText) findViewById(R.id.describeField);
         actualPosition.setTitle(title.getText().toString());
         actualPosition.setDescription(describe.getText().toString());
-        actualPosition.setLatitude(pos.getLatitude());
-        actualPosition.setLongitude(pos.getLongitude());
+        actualPosition.setLatitude(pos.latitude);
+        actualPosition.setLongitude(pos.longitude);
         return service.save(actualPosition);
 
+    }
+
+    private LatLng getLocationFromIntent(){
+        LatLng latLng = null;
+                Bundle bundle = getIntent().getExtras();
+        if(Constants.RESULT.NEW == (Constants.RESULT)bundle.get(Constants.PARAMETER.POSITION_ID.name())){
+            latLng = (LatLng)bundle.get(Constants.PARAMETER.LOCATION.name());
+        }else{
+            Position pos = (Position) bundle.get(Constants.PARAMETER.POSITION.name());
+            latLng = new LatLng(pos.getLatitude(), pos.getLongitude());
+        }
+
+        return latLng;
     }
 }
