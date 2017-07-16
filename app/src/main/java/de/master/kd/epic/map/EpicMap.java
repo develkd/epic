@@ -384,7 +384,10 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
         for (int i = 0; i < address.getMaxAddressLineIndex(); i++) {
             builder.append(address.getAddressLine(i)).append("\n");
         }
-        builder.append(address.getAdminArea()).append("\n");
+        String area = address.getAdminArea();
+        if(!StringUtils.isEmpty(area)) {
+            builder.append(area).append("\n");
+        }
         return builder.toString();
 
     }
