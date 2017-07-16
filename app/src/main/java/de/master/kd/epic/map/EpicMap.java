@@ -361,41 +361,48 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
 
 
     private void shareMapMarker() {
-        LatLng location = selectedMarker.getPosition();
-        Double latitude = location.latitude;
-        Double longitude = location.longitude;
+        LatLng latLng = selectedMarker.getPosition();
 
-//        String uri = "geo:" + latitude + ","
-//                +longitude + "?q=" + latitude
-//                + "," + longitude;
-//        startActivity(new Intent(android.content.Intent.ACTION_VIEW,
-//                Uri.parse(uri)));
-        Geocoder geocoder = new Geocoder(getApplicationContext());
-        String pos = "";
-        try {
-            List<Address> adds = geocoder.getFromLocation(location.latitude, location.longitude, 1);
-            pos = adds.get(0).getLocality() + " " + adds.get(0).getCountryName();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        String uri = "http://maps.google.com/maps?saddr=" + location.latitude + "," + location.longitude;
+        String uri = "http://maps.google.com/maps?saddr=" + latLng.latitude + "," + latLng.longitude;
         Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
         sharingIntent.setType("text/plain");
-        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, selectedMarker.getTitle() + ": " + pos);
+        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, getGeoCodedAdressInfo(selectedMarker.getTitle(), latLng));
         sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, uri);
         startActivity(Intent.createChooser(sharingIntent, "Share via"));
+    }
 
 
-//        Intent sendIntent = new Intent();
-//        sendIntent.setAction(Intent.ACTION_SEND);
-//        sendIntent.putExtra(Intent.EXTRA_SUBJECT,"[contenttagger] " + selectedMarker.getTitle());
-//        sendIntent.putExtra(Intent.EXTRA_TEXT, selectedMarker.getPosition() + "\n\n [sent from contenttagger@android]");
-//        sendIntent.setType("text/plain");
-//        startActivity(sendIntent);
+
+    private String getGeoCodedAdressInfo(String title, LatLng latLng){
+        StringBuilder builder = new StringBuilder();
+        builder.append(title).append(": \n");
+        Address address = getAdress(latLng);
+        if(null == address){
+            return "Not found";
+        }
+
+        for (int i = 0; i < address.getMaxAddressLineIndex(); i++) {
+            builder.append(address.getAddressLine(i)).append("\n");
+        }
+        builder.append(address.getAdminArea()).append("\n");
+        return builder.toString();
 
     }
 
 
+    private Address getAdress( LatLng latLng){
+        Geocoder geocoder = new Geocoder(getApplicationContext());
+        List<Address> adds = null;
+        try {
+           adds = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if(null == adds && adds.isEmpty()){
+            return null;
+        }
+
+        return  adds.get(0);
+    }
 }
