@@ -19,7 +19,7 @@ public interface PositionCRUD {
     Position findByTitle(String title);
     Position findById(Long id);
     List<Position> findByLocation(LatLng latLng);
-
+    List<Position> findByLocation(String latitude, String longitude);
     List<Position> getAllPositions();
 
 }

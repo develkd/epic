@@ -87,24 +87,25 @@ public class PositionRepository implements PositionCRUD {
                 new String[]{Converter.toString(id),
                         }, null, null, null);
 
-
         List<Position> positions = exceuteQuery(cursor);
         return positions.isEmpty() ? null : positions.get(0);
-
     }
 
     @Override
     public List<Position> findByLocation(LatLng latLng) {
+        return findByLocation(Converter.toString(latLng.latitude),Converter.toString(latLng.longitude) );
+    }
+
+    public List<Position> findByLocation(String latitude, String longitude) {
         SQLiteDatabase db = em.getReadableDatabase();
 
         Cursor cursor = db.query(PositionTabel.TABLE,
                 PositionTabel.ALL_COLUMNS, " latitude = ? AND longitude = ? ",
-                new String[]{Converter.toString(latLng.latitude),
-                        Converter.toString(latLng.longitude)}, null, null, null);
+                new String[]{latitude,
+                        longitude}, null, null, null);
 
         return exceuteQuery(cursor);
     }
-
 
     @Override
     public List<Position> getAllPositions() {

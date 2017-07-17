@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -14,6 +15,9 @@ import android.support.v4.app.FragmentActivity;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import de.master.kd.epic.map.EpicMap;
 
@@ -42,7 +46,7 @@ public class LocationService {
             return false;
         } else {
             if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                   && !hasAccessToCoarseLocation(activity)) {
+                    && !hasAccessToCoarseLocation(activity)) {
                 setRequestedPermissions(activity);
                 return false;
             }
@@ -74,6 +78,20 @@ public class LocationService {
         }
     }
 
+
+    public String extractGeoCodeFromQuery(Uri uri) {
+        String query = uri.getEncodedQuery();
+        if (null != query && query.contains(",")) {
+            String[] latLong = query.split("[^0-9 .]");
+            int size = latLong.length-1;
+            StringBuilder builder = new StringBuilder();
+            builder.append(latLong[size-1]).append(",").append(latLong[size]);
+            return builder.toString();
+        }
+        return null;
+    }
+
+    //----------------- HELPER -----------------------
     private void doGpsRequest(final EpicMap epicMap) {
         if (ActivityCompat.checkSelfPermission(epicMap,
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
@@ -101,7 +119,7 @@ public class LocationService {
             @Override
             public void onProviderDisabled(String provider) {
                 Toast.makeText(epicMap, "onProviderDisabled", Toast.LENGTH_SHORT).show();
-                epicMap.disableGPS();
+                epicMap.onGpsDisabled();
             }
         });
     }

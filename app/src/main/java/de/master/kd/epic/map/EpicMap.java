@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -38,6 +39,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 import de.master.kd.epic.R;
@@ -75,6 +78,9 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+
         setContentView(R.layout.map_layout);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.epic_map);
 
@@ -93,8 +99,11 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
         buildGoogleApiClient();
         gpsService = new GpsService(this);
         service = new PositionService(this);
-    }
 
+
+
+
+    }
 
     public void onMapReady(final GoogleMap map) {
         this.googleMap = map;
@@ -125,6 +134,12 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
         gpsService.isGpsEnabled();
         setExistingMarker();
         addLocationService();
+
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        if("android.intent.action.VIEW".equals(action)){
+            createMarkerForIncomingGeoData(intent);
+        }
     }
 
 
@@ -152,7 +167,7 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
         startActivityForResult(intent, Constants.RESULT.GPS_ACTIVATED.ordinal());
     }
 
-    public void disableGPS() {
+    public void onGpsDisabled() {
         location = null;
         firstEntry = true;
     }
@@ -275,7 +290,8 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
 
         Marker marker = googleMap.addMarker(mops);
         marker.setTag(position);
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(location));
+        LatLng loc = new LatLng(position.getLatitude(),position.getLongitude());
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(loc));
 
     }
 
@@ -363,7 +379,7 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
     private void shareMapMarker() {
         LatLng latLng = selectedMarker.getPosition();
 
-        String uri = "http://maps.google.com/maps?saddr=" + latLng.latitude + "," + latLng.longitude;
+        String uri = "https://www.google.com/maps/dir/?api=1%26destination=" + latLng.latitude + "," + latLng.longitude;
         Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
         sharingIntent.setType("text/plain");
         sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, getGeoCodedAdressInfo(selectedMarker.getTitle(), latLng));
@@ -407,5 +423,37 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
         }
 
         return  adds.get(0);
+    }
+
+
+    private void createMarkerForIncomingGeoData(Intent intent) {
+        ;
+        String geoCode = locationService.extractGeoCodeFromQuery(intent.getData());
+        if(null == geoCode){
+            return;
+        }
+
+        Position position = service.findPositionBy(geoCode);
+        createIntentWith(position);
+    }
+
+
+    private void createIntentWith(Position position){
+        Intent intent = new Intent();
+        intent.putExtra(Constants.PARAMETER.POSITION.name(), position);
+        addNewMapMarker(intent);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Toast.makeText(this, "onPause", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        Toast.makeText(this, "onResume", Toast.LENGTH_SHORT).show();
     }
 }
