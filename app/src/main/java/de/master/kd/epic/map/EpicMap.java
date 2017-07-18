@@ -379,7 +379,7 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
     private void shareMapMarker() {
         LatLng latLng = selectedMarker.getPosition();
 
-        String uri = "https://www.google.com/maps/dir/?api=1%26destination=" + latLng.latitude + "," + latLng.longitude;
+        String uri = "https://maps.google.com/?q=" + latLng.latitude + "," + latLng.longitude;
         Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
         sharingIntent.setType("text/plain");
         sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, getGeoCodedAdressInfo(selectedMarker.getTitle(), latLng));
@@ -394,7 +394,7 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
         builder.append(title).append(": \n");
         Address address = getAdress(latLng);
         if(null == address){
-            return "Not found";
+            return "Keine Adresse vorhanden";
         }
 
         for (int i = 0; i < address.getMaxAddressLineIndex(); i++) {
@@ -418,7 +418,7 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
             e.printStackTrace();
         }
 
-        if(null == adds && adds.isEmpty()){
+        if(null == adds || adds.isEmpty()){
             return null;
         }
 

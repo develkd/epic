@@ -39,8 +39,9 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="de.master.kd.epic.map.EpicMap"/>
                 <category android:name="android.intent.category.APP_MAPS"/>
-                 <data  android:scheme="http"  android:host="www.google.com" android:pathPattern="/maps/.*" />
-                <data android:scheme="https" android:host="www.google.com" android:pathPattern="/maps/.*" />
+                <category android:name="android.intent.category.BROWSABLE"/>
+                 <data  android:scheme="http"  android:host="maps.google.com" />
+                <data android:scheme="https" android:host="maps.google.com" />
             </intent-filter>
 
         </activity>
