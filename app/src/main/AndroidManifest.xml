@@ -44,9 +44,19 @@
                 <data android:scheme="https" android:host="maps.google.com" />
             </intent-filter>
 
+
         </activity>
         <activity android:name=".position.PositionEditActivity" />
         <activity android:name=".position.PositionListActivity" />
+
+        <receiver android:name=".receiver.EpicMapReceiver">
+
+            <intent-filter>
+                <action android:name="android.location.PROVIDERS_CHANGED">
+                </action>
+            </intent-filter>
+
+        </receiver>
         <!--<activity-->
             <!--android:name=".navigation.NavigationActivity"-->
             <!--android:label="@string/title_activity_navigation"-->

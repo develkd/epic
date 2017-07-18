@@ -1,21 +1,17 @@
 package de.master.kd.epic.map;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,7 +20,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -39,8 +34,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 
 import de.master.kd.epic.R;
@@ -70,22 +63,14 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
     private MenuBuilderService menuBuilder;
     private FloatingActionButton markerBtn;
     private Marker selectedMarker;
-    private LocationService locationService;
     private boolean firstEntry = true;
     private float actuallZoomLevel = 16.2f;
-    private GpsService gpsService;
     private PositionService service;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
-
         setContentView(R.layout.map_layout);
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.epic_map);
-
-        mapFragment.getMapAsync(this);
-
         markerBtn = (FloatingActionButton) findViewById(R.id.select_point);
         markerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,21 +79,20 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
             }
         });
         menuBuilder = new MenuBuilderService(this);
-        locationService = new LocationService();
 
-        buildGoogleApiClient();
-        gpsService = new GpsService(this);
         service = new PositionService(this);
+        activateMap();
+    }
 
-
-
-
+    public void activateMap(){
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.epic_map);
+        mapFragment.getMapAsync(this);
     }
 
     public void onMapReady(final GoogleMap map) {
         this.googleMap = map;
 
-        locationService.checkLocationPermission(googleMap,this);
+        LocationService.INSTANCE.checkLocationPermission(googleMap,this);
 
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
@@ -131,7 +115,9 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
         });
 
 
-        gpsService.isGpsEnabled();
+        buildGoogleApiClient();
+
+        GpsService.INSTANCE.isGpsEnabled(this);
         setExistingMarker();
         addLocationService();
 
@@ -156,7 +142,7 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
             updateMapMarker(data);
         }
         if (Constants.RESULT.GPS_ACTIVATED.ordinal() == requestCode) {
-            addLocationService();
+           // addLocationService();
         }
 
     }
@@ -164,12 +150,13 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
 
     public void activateGPS() {
         Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-        startActivityForResult(intent, Constants.RESULT.GPS_ACTIVATED.ordinal());
+       startActivity(intent);
     }
 
-    public void onGpsDisabled() {
+    public void resetLocationOnGpsDisabled() {
         location = null;
         firstEntry = true;
+
     }
 
     @Override
@@ -215,8 +202,8 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
     //-------------------------- HELPERS -------------------------------------------------
 
 
-    private void addLocationService(){
-        locationService.processLocationEvent(this, new LocationHandler() {
+    public void addLocationService(){
+        LocationService.INSTANCE.addLocationHandler(this, new LocationHandler() {
             @Override
             public void processEvent(Location location) {
                 doLocate(location);
@@ -427,8 +414,7 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
 
 
     private void createMarkerForIncomingGeoData(Intent intent) {
-        ;
-        String geoCode = locationService.extractGeoCodeFromQuery(intent.getData());
+        String geoCode = LocationService.INSTANCE.extractGeoCodeFromQuery(intent.getData());
         if(null == geoCode){
             return;
         }

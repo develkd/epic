@@ -16,9 +16,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import de.master.kd.epic.map.EpicMap;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
@@ -28,16 +25,28 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
  */
 
 public class LocationService {
+    public static final  LocationService INSTANCE = new LocationService();
+
     public static final int EPIC_LOCATION_PERMISSIONS_REQUEST = 99;
     private LocationManager locationManager;
+    private EpicMap epicMap;
 
+    private LocationService(){
+
+    }
+
+    public EpicMap getActivity(){
+        return epicMap;
+    }
 
     public LocationManager getLocationManager(EpicMap epicMap) {
         if (null == locationManager) {
+            this.epicMap =epicMap;
             locationManager = (LocationManager) epicMap.getSystemService(Context.LOCATION_SERVICE);
         }
         return locationManager;
     }
+
 
 
     public Boolean checkLocationPermission(EpicMap activity) {
@@ -67,8 +76,7 @@ public class LocationService {
         map.setMyLocationEnabled(true);
     }
 
-    public void processLocationEvent(final EpicMap epicMap, final LocationHandler locationHandler) {
-        locationManager = getLocationManager(epicMap);
+    public void addLocationHandler(final EpicMap epicMap, final LocationHandler locationHandler) {
 
         if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
             doNetworkRequest(epicMap, locationHandler);
@@ -119,7 +127,7 @@ public class LocationService {
             @Override
             public void onProviderDisabled(String provider) {
                 Toast.makeText(epicMap, "onProviderDisabled", Toast.LENGTH_SHORT).show();
-                epicMap.onGpsDisabled();
+                epicMap.resetLocationOnGpsDisabled();
             }
         });
     }
@@ -133,27 +141,28 @@ public class LocationService {
             setRequestedPermissions(epicMap);
             return;
         }
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                locationHandler.processEvent(location);
-            }
 
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-                Toast.makeText(epicMap, "onStatusChanged", Toast.LENGTH_SHORT).show();
-            }
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, new LocationListener() {
+                    @Override
+                    public void onLocationChanged(Location location) {
+                        locationHandler.processEvent(location);
+                    }
 
-            @Override
-            public void onProviderEnabled(String provider) {
-                Toast.makeText(epicMap, "onProviderEnabled", Toast.LENGTH_SHORT).show();
-            }
+                    @Override
+                    public void onStatusChanged(String provider, int status, Bundle extras) {
+                        Toast.makeText(epicMap, "onStatusChanged", Toast.LENGTH_SHORT).show();
+                    }
 
-            @Override
-            public void onProviderDisabled(String provider) {
-                Toast.makeText(epicMap, "onProviderDisabled", Toast.LENGTH_SHORT).show();
-            }
-        });
+                    @Override
+                    public void onProviderEnabled(String provider) {
+                        Toast.makeText(epicMap, "onProviderEnabled", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onProviderDisabled(String provider) {
+                        Toast.makeText(epicMap, "onProviderDisabled", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void setRequestedPermissions(EpicMap activity) {

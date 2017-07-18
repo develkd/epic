@@ -16,17 +16,19 @@ import de.master.kd.epic.map.EpicMap;
  */
 
 public class GpsService {
-    private EpicMap epicMap;
-    private LocationService locationService;
 
-    public GpsService(EpicMap epicMap) {
-        this.epicMap = epicMap;
-        locationService = new LocationService();
+    public static final GpsService INSTANCE = new GpsService();
+    private EpicMap epicMap;
+
+    private  GpsService(){
     }
 
 
-    public boolean isGpsEnabled() {
-        return checkGpsStatus(locationService.getLocationManager(epicMap)
+    public boolean isGpsEnabled(EpicMap epicMap) {
+        if(null == this.epicMap){
+            this.epicMap = epicMap;
+        }
+        return checkGpsStatus(LocationService.INSTANCE.getLocationManager(epicMap)
                 .isProviderEnabled(LocationManager.GPS_PROVIDER));
     }
 
@@ -68,7 +70,7 @@ public class GpsService {
         }
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!locationService.checkLocationPermission(epicMap)) {
+            if (!LocationService.INSTANCE.checkLocationPermission(epicMap)) {
                 Toast.makeText(epicMap, "No permission for GPS found", Toast.LENGTH_LONG).show();
                 return false;
             }
@@ -78,4 +80,11 @@ public class GpsService {
     }
 
 
+    public void activateGPS() {
+        epicMap.addLocationService();
+    }
+
+    public void deactivateGps() {
+        epicMap.resetLocationOnGpsDisabled();
+    }
 }
