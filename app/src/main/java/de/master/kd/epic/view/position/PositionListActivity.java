@@ -1,4 +1,4 @@
-package de.master.kd.epic.position;
+package de.master.kd.epic.view.position;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;

@@ -1,4 +1,4 @@
-package de.master.kd.epic.map.interfaces;
+package de.master.kd.epic.view.map.interfaces;
 
 import android.location.Location;
 

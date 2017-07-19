@@ -5,7 +5,7 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import de.master.kd.epic.map.EpicMap;
+import de.master.kd.epic.view.map.EpicMap;
 
 public class SplashScreen extends AppCompatActivity {
     private static final int SPLASH_TIME_OUT = 2000;

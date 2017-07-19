@@ -23,17 +23,22 @@
         android:supportsRtl="true"
         android:theme="@style/DefaultTheme">
 
-        <activity
-            android:name=".SplashScreen"
-            android:label="@string/title_activity_map"
-            android:theme="@style/SplashTheme">
+        <!--<activity-->
+            <!--android:name=".SplashScreen"-->
+            <!--android:label="@string/title_activity_map"-->
+            <!--android:theme="@style/SplashTheme">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
+        <!--</activity>-->
+        <activity android:name=".view.map.EpicMap"
+            android:theme="@style/ActionBarTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity android:name=".map.EpicMap"
-            android:theme="@style/ActionBarTheme">
+
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -46,10 +51,10 @@
 
 
         </activity>
-        <activity android:name=".position.PositionEditActivity" />
-        <activity android:name=".position.PositionListActivity" />
+        <activity android:name=".view.position.PositionEditActivity" />
+        <activity android:name=".view.position.PositionListActivity" />
 
-        <receiver android:name=".receiver.EpicMapReceiver">
+        <receiver android:name=".view.map.receiver.EpicMapReceiver">
 
             <intent-filter>
                 <action android:name="android.location.PROVIDERS_CHANGED">

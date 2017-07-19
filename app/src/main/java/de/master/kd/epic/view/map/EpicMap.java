@@ -1,4 +1,4 @@
-package de.master.kd.epic.map;
+package de.master.kd.epic.view.map;
 
 import android.app.Activity;
 import android.content.Context;
@@ -39,13 +39,13 @@ import java.util.List;
 import de.master.kd.epic.R;
 import de.master.kd.epic.domain.interfaces.PositionService;
 import de.master.kd.epic.domain.position.Position;
-import de.master.kd.epic.map.interfaces.GpsService;
-import de.master.kd.epic.map.interfaces.LocationHandler;
-import de.master.kd.epic.map.interfaces.LocationService;
-import de.master.kd.epic.map.interfaces.MenuBuilderService;
-import de.master.kd.epic.map.interfaces.MenuItemHandler;
-import de.master.kd.epic.map.interfaces.PictureService;
-import de.master.kd.epic.position.PositionEditActivity;
+import de.master.kd.epic.view.map.interfaces.GpsService;
+import de.master.kd.epic.view.map.interfaces.LocationHandler;
+import de.master.kd.epic.view.map.interfaces.LocationService;
+import de.master.kd.epic.view.map.interfaces.MenuBuilderService;
+import de.master.kd.epic.view.map.interfaces.MenuItemHandler;
+import de.master.kd.epic.view.map.interfaces.PictureService;
+import de.master.kd.epic.view.position.PositionEditActivity;
 import de.master.kd.epic.utils.Constants;
 import de.master.kd.epic.utils.Converter;
 import de.master.kd.epic.utils.StringUtils;

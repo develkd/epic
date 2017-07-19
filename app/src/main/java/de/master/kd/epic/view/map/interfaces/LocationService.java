@@ -1,4 +1,4 @@
-package de.master.kd.epic.map.interfaces;
+package de.master.kd.epic.view.map.interfaces;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -16,7 +16,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 
-import de.master.kd.epic.map.EpicMap;
+import de.master.kd.epic.view.map.EpicMap;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
@@ -108,6 +108,7 @@ public class LocationService {
 
             return;
         }
+
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {

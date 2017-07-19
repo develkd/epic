@@ -1,15 +1,12 @@
-package de.master.kd.epic.map.interfaces;
+package de.master.kd.epic.view.map.interfaces;
 
-import android.content.Context;
-import android.content.Intent;
 import android.location.LocationManager;
 import android.os.Build;
-import android.provider.Settings;
 import android.widget.Toast;
 
 import de.master.kd.epic.infomessage.AlertDialogMessageConfigurator;
 import de.master.kd.epic.infomessage.InfoMessage;
-import de.master.kd.epic.map.EpicMap;
+import de.master.kd.epic.view.map.EpicMap;
 
 /**
  * Created by pentax on 09.07.17.
