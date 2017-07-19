@@ -15,8 +15,9 @@ import com.google.android.gms.maps.model.LatLng;
 import de.master.kd.epic.R;
 import de.master.kd.epic.domain.position.Position;
 import de.master.kd.epic.domain.interfaces.PositionService;
+import de.master.kd.epic.services.FileHandlingService;
 import de.master.kd.epic.view.map.EpicMap;
-import de.master.kd.epic.view.map.interfaces.PictureService;
+import de.master.kd.epic.services.PictureService;
 import de.master.kd.epic.utils.Constants;
 
 public class PositionEditActivity extends AppCompatActivity {
@@ -27,6 +28,8 @@ public class PositionEditActivity extends AppCompatActivity {
     private Bitmap bitmap;
     private PositionService service;
     private Position actualPosition;
+    private String imagePath;
+
     @Override
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
@@ -103,6 +106,7 @@ public class PositionEditActivity extends AppCompatActivity {
        if(null == bitmap) {
            return;
        }
+        imagePath = FileHandlingService.getSavedImagePath(getApplicationContext(),bitmap);
         imageView.setImageBitmap(PictureService.fitBitmapIn(bitmap));
     }
 
@@ -116,6 +120,7 @@ public class PositionEditActivity extends AppCompatActivity {
         actualPosition.setDescription(describe.getText().toString());
         actualPosition.setLatitude(pos.latitude);
         actualPosition.setLongitude(pos.longitude);
+        actualPosition.setPathPicture(imagePath);
         return service.save(actualPosition);
 
     }

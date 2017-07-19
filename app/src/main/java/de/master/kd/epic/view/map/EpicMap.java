@@ -39,12 +39,12 @@ import java.util.List;
 import de.master.kd.epic.R;
 import de.master.kd.epic.domain.interfaces.PositionService;
 import de.master.kd.epic.domain.position.Position;
-import de.master.kd.epic.view.map.interfaces.GpsService;
+import de.master.kd.epic.services.GpsService;
 import de.master.kd.epic.view.map.interfaces.LocationHandler;
-import de.master.kd.epic.view.map.interfaces.LocationService;
-import de.master.kd.epic.view.map.interfaces.MenuBuilderService;
+import de.master.kd.epic.services.LocationService;
+import de.master.kd.epic.view.map.interfaces.MenuBuilder;
 import de.master.kd.epic.view.map.interfaces.MenuItemHandler;
-import de.master.kd.epic.view.map.interfaces.PictureService;
+import de.master.kd.epic.services.PictureService;
 import de.master.kd.epic.view.position.PositionEditActivity;
 import de.master.kd.epic.utils.Constants;
 import de.master.kd.epic.utils.Converter;
@@ -60,7 +60,7 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
     private GoogleApiClient googleApiClient;
     private LocationRequest locationRequest;
     private LatLng location;
-    private MenuBuilderService menuBuilder;
+    private MenuBuilder menuBuilder;
     private FloatingActionButton markerBtn;
     private Marker selectedMarker;
     private boolean firstEntry = true;
@@ -78,7 +78,7 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
                 markPosition(view);
             }
         });
-        menuBuilder = new MenuBuilderService(this);
+        menuBuilder = new MenuBuilder(this);
 
         service = new PositionService(this);
         activateMap();
@@ -212,6 +212,7 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
     }
 
     private void markPosition(View view) {
+        location = new LatLng(52.619,13.23334);
         if (null == location) {
             Toast.makeText(this, "GPS ist nicht bereit", Toast.LENGTH_SHORT).show();
             return;
@@ -246,8 +247,10 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Men
         View layout = getMarkerLayout();
         ImageView view = (ImageView) layout.findViewById(R.id.bmp_view);
         if (null != path) {
-//            Bitmap b = PictureService.createMarkerIcon(bitmap);
-//            view.setImageBitmap(b);
+            Bitmap b = PictureService.loadImage(getApplicationContext(),path);
+            if(null != b) {
+                view.setImageBitmap(b);
+            }
         }
         return layout;
     }

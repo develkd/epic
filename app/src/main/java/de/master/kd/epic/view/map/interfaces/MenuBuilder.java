@@ -13,7 +13,7 @@ import de.master.kd.epic.utils.Constants;
  * Created by pentax on 07.07.17.
  */
 
-public class MenuBuilderService {
+public class MenuBuilder {
 
     private FloatingActionButton edit_item, route_item, snych_item, trash_item, share_item;
     private Animation showMenu, hideMenu;
@@ -21,7 +21,7 @@ public class MenuBuilderService {
     private Activity activity;
     // PopupMenu popupMenu;
 
-    public MenuBuilderService(MenuItemHandler handler) {
+    public MenuBuilder(MenuItemHandler handler) {
         this.handler = handler;
         this.activity = handler.getImplementer();
         buildMenu();

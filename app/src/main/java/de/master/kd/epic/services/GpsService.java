@@ -1,4 +1,4 @@
-package de.master.kd.epic.view.map.interfaces;
+package de.master.kd.epic.services;
 
 import android.location.LocationManager;
 import android.os.Build;

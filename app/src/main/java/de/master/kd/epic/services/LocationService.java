@@ -1,4 +1,4 @@
-package de.master.kd.epic.view.map.interfaces;
+package de.master.kd.epic.services;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.google.android.gms.maps.GoogleMap;
 
 import de.master.kd.epic.view.map.EpicMap;
+import de.master.kd.epic.view.map.interfaces.LocationHandler;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 

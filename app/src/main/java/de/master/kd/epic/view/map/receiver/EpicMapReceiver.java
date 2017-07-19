@@ -8,7 +8,7 @@ import android.location.LocationManager;
 import android.provider.Settings;
 import android.widget.Toast;
 
-import de.master.kd.epic.view.map.interfaces.GpsService;
+import de.master.kd.epic.services.GpsService;
 
 /**
  * Created by pentax on 16.07.17.
@@ -17,8 +17,6 @@ import de.master.kd.epic.view.map.interfaces.GpsService;
 public class EpicMapReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-       ContentResolver res =  context.getContentResolver();
-        int value = Settings.Secure.getInt(res,Settings.Secure.LOCATION_MODE, Settings.Secure.LOCATION_MODE_OFF);
 
         if (intent.getAction().matches("android.location.PROVIDERS_CHANGED")) {
             if (!((LocationManager)context.getSystemService(Context.LOCATION_SERVICE)).isProviderEnabled(LocationManager.GPS_PROVIDER)) {

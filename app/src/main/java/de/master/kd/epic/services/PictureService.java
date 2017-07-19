@@ -1,4 +1,4 @@
-package de.master.kd.epic.view.map.interfaces;
+package de.master.kd.epic.services;
 
 import android.app.Activity;
 import android.content.Context;
@@ -8,9 +8,15 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.RelativeLayout;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by pentax on 03.07.17.
@@ -59,4 +65,11 @@ public class PictureService {
     }
 
 
+    public static Bitmap loadImage(Context context,String path) {
+        Bitmap b =  FileHandlingService.getImageBitmap(context, path);
+        if(null == b){
+            b = createMarkerIcon(b);
+        }
+        return b;
+    }
 }
