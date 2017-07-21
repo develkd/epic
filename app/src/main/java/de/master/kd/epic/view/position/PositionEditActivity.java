@@ -61,6 +61,8 @@ public class PositionEditActivity extends AppCompatActivity {
         EditText describe = (EditText) findViewById(R.id.describeField);
         text.setText(actualPosition.getTitle());
         describe.setText(actualPosition.getDescription());
+        imageView.setImageBitmap(FileHandlingService.getImageBitmap(getApplicationContext(), actualPosition.getPicturePath()));
+
     }
 
     private Position getPositionFromIntent() {
@@ -120,7 +122,7 @@ public class PositionEditActivity extends AppCompatActivity {
         actualPosition.setDescription(describe.getText().toString());
         actualPosition.setLatitude(pos.latitude);
         actualPosition.setLongitude(pos.longitude);
-        actualPosition.setPathPicture(imagePath);
+        actualPosition.setPicturePath(imagePath);
         return service.save(actualPosition);
 
     }

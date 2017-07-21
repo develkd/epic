@@ -282,7 +282,7 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Act
 
     private void setExistingMarker() {
         for (Position position : positionService.getPositions()) {
-            MarkerOptions mops = createMarkerWith(position, getPictureLayout(position.getPathPicture()));
+            MarkerOptions mops = createMarkerWith(position, getPictureLayout(position.getPicturePath()));
             Marker marker = googleMap.addMarker(mops);
             marker.setTag(position);
         }

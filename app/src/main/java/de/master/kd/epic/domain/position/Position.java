@@ -66,19 +66,19 @@ public class Position extends BaseObservable implements BaseColumns, Serializabl
         this.longitude = longitude;
     }
 
-    public String getPathMap() {
+    public String getMapPath() {
         return pathMap;
     }
 
-    public void setPathMap(String pathMap) {
+    public void setMapPath(String pathMap) {
         this.pathMap = pathMap;
     }
 
-    public String getPathPicture() {
+    public String getPicturePath() {
         return pathPicture;
     }
 
-    public void setPathPicture(String pathPicture) {
+    public void setPicturePath(String pathPicture) {
         this.pathPicture = pathPicture;
     }
 

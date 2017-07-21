@@ -141,8 +141,8 @@ public class PositionRepository implements PositionCRUD {
         p.setDescription(cursor.getString(cursor.getColumnIndex(PositionTabel.DESCRIPTION)));
         p.setLatitude(Converter.toDouble(cursor.getString(cursor.getColumnIndex(PositionTabel.LATITUDE))));
         p.setLongitude(Converter.toDouble(cursor.getString(cursor.getColumnIndex(PositionTabel.LONGITUDE))));
-        p.setPathMap(cursor.getString(cursor.getColumnIndex(PositionTabel.MAP_PATH)));
-        p.setPathPicture(cursor.getString(cursor.getColumnIndex(PositionTabel.PICTURE_PATH)));
+        p.setMapPath(cursor.getString(cursor.getColumnIndex(PositionTabel.MAP_PATH)));
+        p.setPicturePath(cursor.getString(cursor.getColumnIndex(PositionTabel.PICTURE_PATH)));
         p.setCreateDate(Converter.toDate(cursor.getString(cursor.getColumnIndex(PositionTabel.CREATE_DATE))));
         p.setCreateDate(Converter.toDate(cursor.getString(cursor.getColumnIndex(PositionTabel.UPDATE_DATE))));
 
@@ -156,8 +156,8 @@ public class PositionRepository implements PositionCRUD {
         values.put(PositionTabel.DESCRIPTION, position.getDescription());
         values.put(PositionTabel.LATITUDE, Converter.toString(position.getLatitude()));
         values.put(PositionTabel.LONGITUDE, Converter.toString(position.getLongitude()));
-        values.put(PositionTabel.MAP_PATH, position.getPathMap());
-        values.put(PositionTabel.PICTURE_PATH, position.getPathPicture());
+        values.put(PositionTabel.MAP_PATH, position.getMapPath());
+        values.put(PositionTabel.PICTURE_PATH, position.getPicturePath());
 
         if(create){
             values.put(PositionTabel.CREATE_DATE, Converter.toString(new Date()));

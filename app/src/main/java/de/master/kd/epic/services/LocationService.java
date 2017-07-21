@@ -162,15 +162,6 @@ public class LocationService {
         return providerEnabled;
     }
 
-    private boolean checkLocationPermission() {
-        if (!hasAccessToFineLocationOnSelf() && !hasAccessToCoarseLocation()) {
-            setRequestedPermissions(epic);
-            return false;
-        }
-
-        return true;
-
-    }
 
     private void doNetworkRequest(final LocationHandler locationHandler) {
         if (ActivityCompat.checkSelfPermission(epic,
@@ -218,17 +209,6 @@ public class LocationService {
                         Manifest.permission.ACCESS_COARSE_LOCATION,
                         Manifest.permission.ACCESS_NETWORK_STATE},
                 EPIC_LOCATION_PERMISSIONS_REQUEST);
-    }
-
-    @TargetApi(Build.VERSION_CODES.M)
-    private boolean hasAccessToFineLocationOnSelf() {
-        return PERMISSION_GRANTED == epic.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
-    }
-
-
-    @TargetApi(Build.VERSION_CODES.M)
-    private boolean hasAccessToCoarseLocation() {
-        return PERMISSION_GRANTED == epic.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION);
     }
 
 
