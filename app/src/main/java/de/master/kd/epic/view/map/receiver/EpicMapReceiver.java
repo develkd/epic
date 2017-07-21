@@ -1,14 +1,10 @@
 package de.master.kd.epic.view.map.receiver;
 
 import android.content.BroadcastReceiver;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.location.LocationManager;
-import android.provider.Settings;
 import android.widget.Toast;
-
-import de.master.kd.epic.services.GpsService;
 
 /**
  * Created by pentax on 16.07.17.
@@ -22,12 +18,10 @@ public class EpicMapReceiver extends BroadcastReceiver {
             if (!((LocationManager)context.getSystemService(Context.LOCATION_SERVICE)).isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 Toast.makeText(context, "Intent Detected. OFF",
                         Toast.LENGTH_LONG).show();
-                GpsService.INSTANCE.deactivateGps();
 
             }else{
                 Toast.makeText(context, "Intent Detected. ON",
                         Toast.LENGTH_LONG).show();
-                GpsService.INSTANCE.activateGPS();
             }
 
         }
