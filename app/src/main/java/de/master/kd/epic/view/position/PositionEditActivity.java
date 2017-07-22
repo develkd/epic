@@ -16,6 +16,7 @@ import de.master.kd.epic.R;
 import de.master.kd.epic.domain.position.Position;
 import de.master.kd.epic.domain.interfaces.PositionService;
 import de.master.kd.epic.services.FileHandlingService;
+import de.master.kd.epic.utils.StringUtils;
 import de.master.kd.epic.view.map.EpicMap;
 import de.master.kd.epic.services.PictureService;
 import de.master.kd.epic.utils.Constants;
@@ -61,7 +62,10 @@ public class PositionEditActivity extends AppCompatActivity {
         EditText describe = (EditText) findViewById(R.id.describeField);
         text.setText(actualPosition.getTitle());
         describe.setText(actualPosition.getDescription());
-        imageView.setImageBitmap(FileHandlingService.getImageBitmap(getApplicationContext(), actualPosition.getPicturePath()));
+        if(!StringUtils.isEmpty(actualPosition.getPicturePath())) {
+            imageView.setImageBitmap(FileHandlingService.getImageBitmap(getApplicationContext(), actualPosition.getPicturePath()));
+            imageView.setRotation(90);
+        }
 
     }
 

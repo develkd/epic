@@ -29,7 +29,7 @@ public class PictureService {
     }
 
     public static Bitmap createMarkerIcon(Bitmap src) {
-        return resizeBitmap(src, 34, 31);
+        return resizeBitmap(src, 34, 34);
     }
 
 

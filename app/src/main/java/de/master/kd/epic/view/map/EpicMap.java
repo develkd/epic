@@ -271,6 +271,7 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Act
             Bitmap b = PictureService.loadImage(getApplicationContext(), path);
             if (null != b) {
                 view.setImageBitmap(b);
+                view.setRotation(90);
             }
         }
         return layout;

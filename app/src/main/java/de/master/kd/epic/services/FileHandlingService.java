@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import de.master.kd.epic.utils.StringUtils;
+
 /**
  * Created by pentax on 19.07.17.
  */
@@ -52,13 +54,17 @@ public class FileHandlingService {
 
 
 
-    public static Bitmap getImageBitmap(Context context, String name) {
+    public static Bitmap getImageBitmap(Context context, String fileName) {
+        if(StringUtils.isEmpty(fileName)){
+            return null;
+        }
+
         FileInputStream fis = null;
         try {
             ContextWrapper cw = new ContextWrapper(context);
             File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
             // Create imageDir
-            File mypath = new File(directory,name);
+            File mypath = new File(directory,fileName);
             fis = new FileInputStream(mypath);
 
             return BitmapFactory.decodeStream(fis);
