@@ -16,6 +16,7 @@ import de.master.kd.epic.R;
 import de.master.kd.epic.domain.position.Position;
 import de.master.kd.epic.domain.interfaces.PositionService;
 import de.master.kd.epic.services.FileHandlingService;
+import de.master.kd.epic.services.MapThumbnailService;
 import de.master.kd.epic.utils.StringUtils;
 import de.master.kd.epic.view.map.EpicMap;
 import de.master.kd.epic.services.PictureService;
@@ -25,17 +26,20 @@ public class PositionEditActivity extends AppCompatActivity {
 
 
     private ImageView imageView;
+    private ImageView mapView;
     private FloatingActionButton postionSave;
-    private Bitmap bitmap;
+    private Bitmap pictureBitmap;
+    private Bitmap mapBitmap;
     private PositionService service;
     private Position actualPosition;
-    private String imagePath;
-
+    private String mapPath;
+    private String picutePath;
     @Override
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         setContentView(R.layout.activity_postion_edit);
         service = new PositionService(this);
+        mapView = (ImageView)findViewById(R.id.imageViewMap);
 
         imageView = (ImageView) findViewById(R.id.imageViewCamera);
         imageView.setOnClickListener(new View.OnClickListener() {
@@ -53,6 +57,14 @@ public class PositionEditActivity extends AppCompatActivity {
             }
         });
         addPostionData();
+
+    }
+
+    private void addMapTumbnail() {
+      mapBitmap =  new MapThumbnailService().getThumbnailFor(getLocationFromIntent());
+        if(null !=mapBitmap){
+            mapView.setImageBitmap(mapBitmap);
+        }
     }
 
     private void addPostionData() {
@@ -62,11 +74,20 @@ public class PositionEditActivity extends AppCompatActivity {
         EditText describe = (EditText) findViewById(R.id.describeField);
         text.setText(actualPosition.getTitle());
         describe.setText(actualPosition.getDescription());
-        if(!StringUtils.isEmpty(actualPosition.getPicturePath())) {
-            imageView.setImageBitmap(FileHandlingService.getImageBitmap(getApplicationContext(), actualPosition.getPicturePath()));
+        picutePath = actualPosition.getPicturePath();
+        mapPath = actualPosition.getMapPath();
+        if(!StringUtils.isEmpty(picutePath)) {
+            pictureBitmap = getBitmapFor(picutePath);
+            imageView.setImageBitmap(pictureBitmap);
             imageView.setRotation(90);
         }
 
+        if(!StringUtils.isEmpty(mapPath)) {
+            mapBitmap = getBitmapFor(mapPath);
+            mapView.setImageBitmap(mapBitmap);
+        }else{
+            addMapTumbnail();
+        }
     }
 
     private Position getPositionFromIntent() {
@@ -90,7 +111,7 @@ public class PositionEditActivity extends AppCompatActivity {
         Intent intent = new Intent(PositionEditActivity.this, EpicMap.class);
 
         intent.putExtra(Constants.PARAMETER.POSITION.name(), p);
-        intent.putExtra(Constants.PARAMETER.PICTURE.name(), bitmap);
+        intent.putExtra(Constants.PARAMETER.PICTURE.name(), pictureBitmap);
         setResult(getResultType().ordinal(), intent);
         finish();
     }
@@ -108,12 +129,10 @@ public class PositionEditActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Bundle extras = data.getExtras();
-        bitmap = (Bitmap) extras.get("data");
-       if(null == bitmap) {
-           return;
+        pictureBitmap = (Bitmap) extras.get("data");
+       if(null != pictureBitmap) {
+           imageView.setImageBitmap(PictureService.fitBitmapIn(pictureBitmap));
        }
-        imagePath = FileHandlingService.getSavedImagePath(getApplicationContext(),bitmap);
-        imageView.setImageBitmap(PictureService.fitBitmapIn(bitmap));
     }
 
 
@@ -126,11 +145,23 @@ public class PositionEditActivity extends AppCompatActivity {
         actualPosition.setDescription(describe.getText().toString());
         actualPosition.setLatitude(pos.latitude);
         actualPosition.setLongitude(pos.longitude);
-        actualPosition.setPicturePath(imagePath);
+        actualPosition.setPicturePath(getPathFor("PIC_",picutePath,pictureBitmap));
+        actualPosition.setMapPath(getPathFor("MAP_",mapPath,mapBitmap));
         return service.save(actualPosition);
 
     }
 
+    private String getPathFor(String prefix, String path, Bitmap bitmap){
+        String newPath = null;
+        if(null != bitmap) {
+            newPath = FileHandlingService.getSavedImagePath(getApplicationContext(), prefix, path,bitmap);
+        }
+        return newPath;
+    }
+
+    private Bitmap getBitmapFor(String path){
+       return FileHandlingService.getImageBitmap(getApplicationContext(), path);
+    }
     private LatLng getLocationFromIntent(){
         LatLng latLng = null;
                 Bundle bundle = getIntent().getExtras();

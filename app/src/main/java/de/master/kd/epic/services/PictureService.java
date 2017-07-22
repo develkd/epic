@@ -3,6 +3,7 @@ package de.master.kd.epic.services;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
@@ -15,6 +16,7 @@ import android.widget.RelativeLayout;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -72,4 +74,5 @@ public class PictureService {
         }
         return b;
     }
+
 }

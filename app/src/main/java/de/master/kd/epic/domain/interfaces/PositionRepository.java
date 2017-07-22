@@ -47,7 +47,7 @@ public class PositionRepository implements PositionCRUD {
                 SQLiteDatabase.CONFLICT_REPLACE);
         db.close();
 
-        return position;
+        return findById(position.getId());
 
     }
 
@@ -83,7 +83,7 @@ public class PositionRepository implements PositionCRUD {
     public Position findById(Long id) {
         SQLiteDatabase db = em.getReadableDatabase();
         Cursor cursor = db.query(PositionTabel.TABLE,
-                PositionTabel.ALL_COLUMNS, PositionTabel._ID,
+                PositionTabel.ALL_COLUMNS, " _id = ?",
                 new String[]{Converter.toString(id),
                         }, null, null, null);
 
@@ -144,7 +144,7 @@ public class PositionRepository implements PositionCRUD {
         p.setMapPath(cursor.getString(cursor.getColumnIndex(PositionTabel.MAP_PATH)));
         p.setPicturePath(cursor.getString(cursor.getColumnIndex(PositionTabel.PICTURE_PATH)));
         p.setCreateDate(Converter.toDate(cursor.getString(cursor.getColumnIndex(PositionTabel.CREATE_DATE))));
-        p.setCreateDate(Converter.toDate(cursor.getString(cursor.getColumnIndex(PositionTabel.UPDATE_DATE))));
+        p.setUpdateDate(Converter.toDate(cursor.getString(cursor.getColumnIndex(PositionTabel.UPDATE_DATE))));
 
 
         return p;

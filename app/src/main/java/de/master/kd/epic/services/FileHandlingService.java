@@ -26,19 +26,16 @@ import de.master.kd.epic.utils.StringUtils;
 public class FileHandlingService {
 
 
-    public static String getSavedImagePath(Context context, Bitmap b) {
+    public static String getSavedImagePath(Context context, String prefix, String fileName, Bitmap b) {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
+        String imageFileName = StringUtils.isEmpty(fileName) ? prefix+ timeStamp + "_" :fileName;
         ContextWrapper cw = new ContextWrapper(context);
-        // path to /data/data/yourapp/app_data/imageDir
         File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
-        // Create imageDir
         File mypath = new File(directory, imageFileName);
 
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(mypath);
-            // Use the compress method on the BitMap object to write image to the OutputStream
             b.compress(Bitmap.CompressFormat.PNG, 100, fos);
         } catch (Exception e) {
             e.printStackTrace();
