@@ -32,7 +32,7 @@ public class MenuBuilder {
         edit_item = getEditActionButton();
         trash_item = getDeleteActionButton();
         share_item = getShareActionButton();
-        route_item = (FloatingActionButton) activity.findViewById(R.id.item_route_task);
+        route_item = getRouteActionButton();
         snych_item = (FloatingActionButton) activity.findViewById(R.id.item_synch_task);
 
         showMenu = AnimationUtils.loadAnimation(activity.getApplicationContext(), R.anim.menu_open);
@@ -71,39 +71,50 @@ public class MenuBuilder {
     }
 
     private FloatingActionButton getEditActionButton() {
-        FloatingActionButton edit_item = (FloatingActionButton) activity.findViewById(R.id.item_edit_task);
-        edit_item.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton item = (FloatingActionButton) activity.findViewById(R.id.item_edit_task);
+        item.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 toggleMenuVisibilty(false);
                 handler.doHandleActionEvent(Constants.REQUEST.EDIT, Constants.RESULT.UPDATED);
             }
         });
-        return edit_item;
+        return item;
     }
 
     private FloatingActionButton getDeleteActionButton() {
-        FloatingActionButton edit_item = (FloatingActionButton) activity.findViewById(R.id.item_delete_task);
-        edit_item.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton item = (FloatingActionButton) activity.findViewById(R.id.item_delete_task);
+        item.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 toggleMenuVisibilty(false);
                 handler.doHandleActionEvent(Constants.REQUEST.DELETE, Constants.RESULT.NO_RESULT_CHECK);
             }
         });
-        return edit_item;
+        return item;
     }
 
     private FloatingActionButton getShareActionButton() {
-        FloatingActionButton edit_item = (FloatingActionButton) activity.findViewById(R.id.item_share_task);
-        edit_item.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton item = (FloatingActionButton) activity.findViewById(R.id.item_share_task);
+        item.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 toggleMenuVisibilty(false);
                 handler.doHandleActionEvent(Constants.REQUEST.SHARE, Constants.RESULT.NO_RESULT_CHECK);
             }
         });
-        return edit_item;
+        return item;
     }
 
+    private FloatingActionButton getRouteActionButton() {
+        FloatingActionButton item = (FloatingActionButton) activity.findViewById(R.id.item_route_task);
+        item.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleMenuVisibilty(false);
+                handler.doHandleActionEvent(Constants.REQUEST.ROUTE, Constants.RESULT.NO_RESULT_CHECK);
+            }
+        });
+        return item;
+    }
 }

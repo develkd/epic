@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -214,12 +215,17 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Act
             case SHARE:
                 shareMapMarker();
                 break;
+            case ROUTE:
+                doRoute();
+                break;
 
             default:
                 throw new IllegalArgumentException("Requesttype " + request + " not supported yet");
         }
 
     }
+
+
 
     public void addLocationService() {
         locationService.addLocationHandler(this, new LocationHandler() {
@@ -378,6 +384,7 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Act
     private void deleteMapMarker() {
         positionService.remove((Position) selectedMarker.getTag());
         selectedMarker.remove();
+        //TODO: DELETE Pic and Map, too
         selectedMarker = null;
     }
 
@@ -398,6 +405,17 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Act
         sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, getGeoCodedAdressInfo(selectedMarker.getTitle(), latLng));
         sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, uri);
         startActivity(Intent.createChooser(sharingIntent, "Share via"));
+    }
+
+
+    private void doRoute(){
+        LatLng latLng = selectedMarker.getPosition();
+
+        Uri gmmIntentUri = Uri.parse("google.navigation:q="+ latLng.latitude + "," + latLng.longitude);
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+        mapIntent.setPackage("com.google.android.apps.maps");
+        startActivity(mapIntent);
+
     }
 
 

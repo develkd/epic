@@ -10,7 +10,8 @@ public interface Constants {
     public enum REQUEST {
         EDIT,
         DELETE,
-        SHARE,;
+        SHARE,
+        ROUTE;
     }
 
     public enum PARAMETER {
