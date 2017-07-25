@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/item_edit_task"
+        android:title="Bearbeiten"
+        app:showAsAction="always|withText"
+        android:icon="@drawable/ic_edit" />
+
+
+    <item
+        android:id="@+id/item_route_task"
+        android:title="Routen"
+        app:showAsAction="always|withText"
+        android:icon="@drawable/ic_route" />
+
+    <item
+        android:id="@+id/item_synch_task"
+        android:title="Synchronisieren"
+        app:showAsAction="always|withText"
+        android:icon="@drawable/ic_sync" />
+
+    <item
+        android:id="@+id/item_delete_task"
+        android:title="Löschen"
+        app:showAsAction="always|withText"
+        android:icon="@drawable/ic_trash" />
+</menu>

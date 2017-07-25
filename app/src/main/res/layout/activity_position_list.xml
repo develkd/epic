@@ -7,9 +7,6 @@
     android:orientation="vertical"
     tools:context=".view.position.PositionListActivity">
 
-
-
-
     <ListView
         android:id="@+id/custom_list"
         android:layout_width="match_parent"
@@ -21,75 +18,5 @@
         android:elevation="0dp"
         android:longClickable="false"
         android:persistentDrawingCache="animation" />
-
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/item_context_menu"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/item_edit_margin"
-        android:clickable="true"
-        app:backgroundTint="@color/colorPrimary"
-        app:srcCompat="@drawable/ic_action_menu" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/item_edit_task"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginRight="100dp"
-        android:layout_marginBottom="5dp"
-        android:scaleType="center"
-        android:scaleX="0.8"
-        android:scaleY="0.8"
-        android:clickable="true"
-        app:rippleColor="@android:color/transparent"
-        app:srcCompat="@drawable/ic_edit" />
-
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/item_route_task"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginRight="85dp"
-        android:layout_marginBottom="55dp"
-        android:scaleType="center"
-        android:scaleX="0.8"
-        android:scaleY="0.8"
-        android:clickable="true"
-        app:rippleColor="@android:color/transparent"
-        app:srcCompat="@drawable/ic_route" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/item_synch_task"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginRight="55dp"
-        android:layout_marginBottom="100dp"
-        android:scaleType="center"
-        android:scaleX="0.8"
-        android:scaleY="0.8"
-        android:clickable="true"
-        app:rippleColor="@android:color/transparent"
-        app:srcCompat="@drawable/ic_sync" />
-
-
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/item_delete_task"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginRight="5dp"
-        android:layout_marginBottom="120dp"
-        android:scaleType="center"
-        android:scaleX="0.8"
-        android:scaleY="0.8"
-        android:clickable="true"
-        app:rippleColor="@android:color/transparent"
-        app:srcCompat="@drawable/ic_trash" />
 
 </android.support.design.widget.CoordinatorLayout>
