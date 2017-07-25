@@ -14,6 +14,7 @@ import java.util.Locale;
 
 public class Converter {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH.mm.ss", Locale.GERMANY);
+    private static final SimpleDateFormat onlyDateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY);
 
     private Converter() {
     }
@@ -21,6 +22,10 @@ public class Converter {
 
     public static final String toString(Date date) {
         return dateFormat.format(date);
+    }
+
+    public static final String toStringDate(Date date) {
+        return onlyDateFormat.format(date);
     }
 
     public static Date toDate(String value) {

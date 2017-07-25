@@ -15,7 +15,10 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -50,12 +53,13 @@ import de.master.kd.epic.view.position.PositionEditActivity;
 import de.master.kd.epic.utils.Constants;
 import de.master.kd.epic.utils.Converter;
 import de.master.kd.epic.utils.StringUtils;
+import de.master.kd.epic.view.position.PositionListActivity;
 
 /**
  * Created by pentax on 28.06.17.
  */
 
-public class EpicMap extends FragmentActivity implements OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback, MenuItemHandler {
+public class EpicMap extends AppCompatActivity implements OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback, MenuItemHandler {
     private GoogleMap googleMap;
 
     private GoogleApiClient googleApiClient;
@@ -90,6 +94,29 @@ public class EpicMap extends FragmentActivity implements OnMapReadyCallback, Act
     public void activateMap() {
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.epic_map);
         mapFragment.getMapAsync(this);
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.navigation,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.action_list_marker:
+                showPostionListView();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void showPostionListView() {
+        Intent intent = new Intent(EpicMap.this, PositionListActivity.class);
+        startActivity(intent);
     }
 
     public void onMapReady(final GoogleMap map) {

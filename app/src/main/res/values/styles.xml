@@ -13,10 +13,6 @@
         <item name="colorAccent">#72edd6</item>
     </style>
 
-    <style name="DefaultTheme.NoActionBar">
-        <item name="windowActionBar">true</item>
-        <item name="windowNoTitle">true</item>
-    </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
