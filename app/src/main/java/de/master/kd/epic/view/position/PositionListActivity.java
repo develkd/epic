@@ -6,6 +6,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.menu.MenuBuilder;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -86,13 +87,26 @@ public class PositionListActivity extends AppCompatActivity  {
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (Constants.RESULT.UPDATED.ordinal() == requestCode) {
+           doUpdate(data);
+        }
+    }
+
+
     private void doEdit() {
         Intent intent = new Intent(PositionListActivity.this, PositionEditActivity.class);
         intent.putExtra(Constants.PARAMETER.POSITION.name(), selectedPosition);
         intent.putExtra(Constants.PARAMETER.POSITION_ID.name(), Constants.RESULT.UPDATED);
-        startActivity(intent);
-        finish();
+        startActivityForResult(intent, Constants.RESULT.UPDATED.ordinal());
     }
+
+    private void doUpdate(Intent data) {
+        doBroadcast(Constants.PARAMETER.POSITION_ID.name(), Constants.REQUEST.EDIT);
+    }
+
 
     private void doRoute(){
         LatLng latLng = new LatLng(selectedPosition.getLatitude(), selectedPosition.getLongitude());
@@ -111,14 +125,17 @@ public class PositionListActivity extends AppCompatActivity  {
     private void doSynch(){
         Toast.makeText(this, "Funktion ist nicht freigeschalten", Toast.LENGTH_LONG).show();
     }
-    private void doDelete() {
 
-        Intent intent = new Intent(BroadcastReceiverHandler.class.getName());
-        intent.putExtra(Constants.PARAMETER.POSITION.name(), selectedPosition);
-        intent.putExtra(Constants.PARAMETER.POSITION_ID.name(), Constants.REQUEST.DELETE);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    private void doDelete() {
+        doBroadcast(Constants.PARAMETER.POSITION_ID.name(), Constants.REQUEST.DELETE);
         selectedPosition = null;
-        finish();
     }
 
+    private void doBroadcast(String key, Constants.REQUEST request) {
+        Intent intent = new Intent(BroadcastReceiverHandler.class.getName());
+        intent.putExtra(Constants.PARAMETER.POSITION.name(), selectedPosition);
+        intent.putExtra(key,request);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        finish();
+    }
 }

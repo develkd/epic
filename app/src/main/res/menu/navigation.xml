@@ -6,4 +6,14 @@
         android:orderInCategory="100"
         android:title="@string/action_list_marker"
         app:showAsAction="collapseActionView" />
+    <item
+        android:id="@+id/action_list_info"
+        android:orderInCategory="200"
+        android:title="@string/action_list_info"
+        app:showAsAction="collapseActionView" />
+    <item
+        android:id="@+id/action_list_help"
+        android:orderInCategory="210"
+        android:title="@string/action_list_help"
+        app:showAsAction="collapseActionView" />
 </menu>

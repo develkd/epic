@@ -107,11 +107,17 @@ public class EpicMap extends AppCompatActivity implements OnMapReadyCallback, Ac
         Bundle bundle = intent.getExtras();
         Constants.REQUEST request = (Constants.REQUEST) bundle.get(Constants.PARAMETER.POSITION_ID.name());
         Position requestedPosition = (Position)bundle.get(Constants.PARAMETER.POSITION.name());
-        if(Constants.REQUEST.DELETE == request){
-            doDeleteFromIntent(requestedPosition);
-            googleMap.clear();
-            setExistingMarker();
+        switch (request){
+            case DELETE: doDeleteFromIntent(requestedPosition);
+                break;
+            case EDIT:
+                // TODO
+                break;
         }
+
+        //FIXME: Anstelle dess, nur den aktuellen ändern!!!
+        googleMap.clear();
+        setExistingMarker();
     }
 
 
@@ -286,6 +292,13 @@ public class EpicMap extends AppCompatActivity implements OnMapReadyCallback, Ac
             Toast.makeText(this, "GPS ist nicht bereit", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        googleMap.snapshot(new GoogleMap.SnapshotReadyCallback() {
+            @Override
+            public void onSnapshotReady(Bitmap bitmap) {
+
+            }
+        });
 
         Intent intent = new Intent(EpicMap.this, PositionEditActivity.class);
         intent.putExtra(Constants.PARAMETER.LOCATION.name(), location);

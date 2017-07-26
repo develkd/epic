@@ -1,29 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/item_edit_task"
-        android:title="Bearbeiten"
+        android:title="@string/menu.context.edit"
         app:showAsAction="always|withText"
-        android:icon="@drawable/ic_edit" />
+        app:icon="@drawable/ic_edit" />
 
+    <item
+        android:id="@+id/item_share_task"
+        android:title="@string/menu.context.share"
+        app:showAsAction="always|withText"
+        app:icon="@drawable/ic_edit" />
 
     <item
         android:id="@+id/item_route_task"
-        android:title="Routen"
+        android:title="@string/menu.context.route"
         app:showAsAction="always|withText"
-        android:icon="@drawable/ic_route" />
+        app:icon="@drawable/ic_route" />
 
     <item
         android:id="@+id/item_synch_task"
-        android:title="Synchronisieren"
+        android:title="@string/menu.context.snych"
         app:showAsAction="always|withText"
-        android:icon="@drawable/ic_sync" />
+        app:icon="@drawable/ic_sync" />
 
     <item
         android:id="@+id/item_delete_task"
-        android:title="Löschen"
+        android:title="@string/menu.context.delete"
         app:showAsAction="always|withText"
-        android:icon="@drawable/ic_trash" />
+        app:icon="@drawable/ic_trash" />
 </menu>

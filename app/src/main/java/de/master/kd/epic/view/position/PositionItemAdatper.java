@@ -37,14 +37,14 @@ public class PositionItemAdatper extends ArrayAdapter<Position> {
         }
         ImageView pic = (ImageView) convertView.findViewById(R.id.custom_pic);
         ImageView map = (ImageView) convertView.findViewById(R.id.custom_map);
-        TextView titel = (TextView) convertView.findViewById(R.id.titel);
+        TextView title = (TextView) convertView.findViewById(R.id.title);
         TextView date = (TextView) convertView.findViewById(R.id.date);
         TextView description = (TextView) convertView.findViewById(R.id.description);
 
         Position item = getItem(position);
         addPictureToView(pic, item.getPicturePath());
         addPictureToView(map,item.getMapPath());
-        titel.setText(item.getTitle());
+        title.setText(item.getTitle());
         date.setText(Converter.toStringDate(item.getCreateDate()));
         description.setText(item.getDescription());
 

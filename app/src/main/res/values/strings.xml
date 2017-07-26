@@ -6,5 +6,14 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_list_marker">Alle Marker verwalten</string>
+    <string name="action_list_info">Info</string>
+    <string name="action_list_help">Hilfe</string>
     <string name="title_activity_map">Epic</string>
+
+    <string name="menu.context.edit">Bearbeiten</string>
+    <string name="menu.context.share">Teilen</string>
+    <string name="menu.context.route">Navigieren</string>
+    <string name="menu.context.snych">Synchronisieren</string>
+    <string name="menu.context.delete">Löschen</string>
+
 </resources>
