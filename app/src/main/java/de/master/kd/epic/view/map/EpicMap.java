@@ -427,13 +427,13 @@ public class EpicMap extends AppCompatActivity implements OnMapReadyCallback, Ac
     private void doShare() {
         LatLng latLng = selectedMarker.getPosition();
         String title = selectedMarker.getTitle();
-        new LocationShareService(getApplicationContext()).sharePosition(latLng, title);
+        new LocationShareService(this).sharePosition(latLng, title);
     }
 
 
    private void doRoute(){
        LatLng latLng = selectedMarker.getPosition();
-       new LocationShareService(getApplicationContext()).doRoute(latLng);
+       new LocationShareService(this).doRoute(latLng);
     }
 
     private void createMarkerForIncomingGeoData(Intent intent) {

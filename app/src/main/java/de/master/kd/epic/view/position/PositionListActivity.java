@@ -110,7 +110,7 @@ public class PositionListActivity extends AppCompatActivity  {
 
     private void doRoute(){
         LatLng latLng = new LatLng(selectedPosition.getLatitude(), selectedPosition.getLongitude());
-        new LocationShareService(getApplicationContext()).doRoute(latLng);
+        new LocationShareService(this).doRoute(latLng);
         finish();
     }
 
@@ -118,7 +118,7 @@ public class PositionListActivity extends AppCompatActivity  {
     private void doShare() {
         LatLng latLng = new LatLng(selectedPosition.getLatitude(), selectedPosition.getLongitude());
         String title = selectedPosition.getTitle();
-        new LocationShareService(getApplicationContext()).sharePosition(latLng, title);
+        new LocationShareService(this).sharePosition(latLng, title);
         finish();
     }
 
