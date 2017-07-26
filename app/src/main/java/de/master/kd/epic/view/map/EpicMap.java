@@ -1,8 +1,8 @@
 package de.master.kd.epic.view.map;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
@@ -10,6 +10,7 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -34,6 +35,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import de.master.kd.epic.R;
 import de.master.kd.epic.domain.interfaces.PositionService;
 import de.master.kd.epic.domain.position.Position;
+import de.master.kd.epic.services.BroadcastReceiverHandler;
+import de.master.kd.epic.services.LocalBroadcastReceiver;
 import de.master.kd.epic.services.LocationService;
 import de.master.kd.epic.services.LocationShareService;
 import de.master.kd.epic.services.PictureService;
@@ -50,7 +53,7 @@ import de.master.kd.epic.view.position.PositionListActivity;
  * Created by pentax on 28.06.17.
  */
 
-public class EpicMap extends AppCompatActivity implements OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback, MenuItemHandler {
+public class EpicMap extends AppCompatActivity implements OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback, MenuItemHandler, BroadcastReceiverHandler {
     private GoogleMap googleMap;
 
     private GoogleApiClient googleApiClient;
@@ -63,6 +66,7 @@ public class EpicMap extends AppCompatActivity implements OnMapReadyCallback, Ac
     private float actuallZoomLevel = 16.2f;
     private PositionService positionService;
     private LocationService locationService;
+    private LocalBroadcastReceiver broadcastReceiver;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -80,11 +84,34 @@ public class EpicMap extends AppCompatActivity implements OnMapReadyCallback, Ac
 
         positionService = new PositionService(this);
         activateMap();
+
+        broadcastReceiver = new LocalBroadcastReceiver(this);
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver,
+                new IntentFilter(BroadcastReceiverHandler.class.getName()));
+    }
+
+    @Override
+    protected void onDestroy() {
+        // Unregister since the activity is about to be closed.
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+        super.onDestroy();
     }
 
     public void activateMap() {
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.epic_map);
         mapFragment.getMapAsync(this);
+    }
+
+    @Override
+    public void handleIntent(Intent intent) {
+        Bundle bundle = intent.getExtras();
+        Constants.REQUEST request = (Constants.REQUEST) bundle.get(Constants.PARAMETER.POSITION_ID.name());
+        Position requestedPosition = (Position)bundle.get(Constants.PARAMETER.POSITION.name());
+        if(Constants.REQUEST.DELETE == request){
+            doDeleteFromIntent(requestedPosition);
+            googleMap.clear();
+            setExistingMarker();
+        }
     }
 
 
@@ -195,7 +222,6 @@ public class EpicMap extends AppCompatActivity implements OnMapReadyCallback, Ac
     public void resetLocationOnGpsDisabled() {
         location = null;
         firstEntry = true;
-
     }
 
     @Override
@@ -221,15 +247,15 @@ public class EpicMap extends AppCompatActivity implements OnMapReadyCallback, Ac
         }
         switch (request) {
             case EDIT:
-                handleEditRequest();
+                doEdit();
                 break;
 
             case DELETE:
-                deleteMapMarker();
+                doDelete();
                 break;
 
             case SHARE:
-                shareMapMarker();
+                doShare();
                 break;
             case ROUTE:
                 doRoute();
@@ -310,6 +336,7 @@ public class EpicMap extends AppCompatActivity implements OnMapReadyCallback, Ac
         }
     }
 
+
     private void addNewMapMarker(Intent data) {
         if (null == data) {
             return;
@@ -361,23 +388,30 @@ public class EpicMap extends AppCompatActivity implements OnMapReadyCallback, Ac
     }
 
 
-
-    private void deleteMapMarker() {
-        positionService.remove((Position) selectedMarker.getTag());
-        selectedMarker.remove();
-        //TODO: DELETE Pic and Map, too
-        selectedMarker = null;
-    }
-
-    private void handleEditRequest() {
+    private void doEdit() {
         Intent intent = new Intent(EpicMap.this, PositionEditActivity.class);
         intent.putExtra(Constants.PARAMETER.POSITION.name(), (Position) selectedMarker.getTag());
         intent.putExtra(Constants.PARAMETER.POSITION_ID.name(), Constants.RESULT.UPDATED);
         startActivityForResult(intent, Constants.RESULT.UPDATED.ordinal());
     }
 
+    private void doDelete() {
+        deletePosition((Position) selectedMarker.getTag());
+        selectedMarker.remove();
+        //TODO: DELETE Pic and Map, too
+        selectedMarker = null;
+    }
 
-    private void shareMapMarker() {
+    private void doDeleteFromIntent(Position requestedPosition) {
+        deletePosition(requestedPosition);
+
+    }
+
+    private void deletePosition(Position deleteablePosition){
+        positionService.remove(deleteablePosition);
+    }
+
+    private void doShare() {
         LatLng latLng = selectedMarker.getPosition();
         String title = selectedMarker.getTitle();
         new LocationShareService(getApplicationContext()).sharePosition(latLng, title);

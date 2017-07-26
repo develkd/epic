@@ -12,6 +12,6 @@ import de.master.kd.epic.utils.Constants;
 public interface MenuItemHandler {
 
     Context getContext();
-    void doHandleActionEvent(Constants.REQUEST map, Constants.RESULT result);
+    void doHandleActionEvent(Constants.REQUEST request, Constants.RESULT result);
 
 }
