@@ -4,17 +4,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,10 +18,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -38,22 +31,19 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.io.IOException;
-import java.util.List;
-
 import de.master.kd.epic.R;
 import de.master.kd.epic.domain.interfaces.PositionService;
 import de.master.kd.epic.domain.position.Position;
-import de.master.kd.epic.services.LocationShareService;
-import de.master.kd.epic.view.map.interfaces.LocationHandler;
 import de.master.kd.epic.services.LocationService;
-import de.master.kd.epic.view.map.interfaces.MenuBuilder;
-import de.master.kd.epic.view.map.interfaces.MenuItemHandler;
+import de.master.kd.epic.services.LocationShareService;
 import de.master.kd.epic.services.PictureService;
-import de.master.kd.epic.view.position.PositionEditActivity;
 import de.master.kd.epic.utils.Constants;
 import de.master.kd.epic.utils.Converter;
 import de.master.kd.epic.utils.StringUtils;
+import de.master.kd.epic.view.map.interfaces.LocationHandler;
+import de.master.kd.epic.view.map.interfaces.MenuBuilder;
+import de.master.kd.epic.view.map.interfaces.MenuItemHandler;
+import de.master.kd.epic.view.position.PositionEditActivity;
 import de.master.kd.epic.view.position.PositionListActivity;
 
 /**
@@ -145,8 +135,6 @@ public class EpicMap extends AppCompatActivity implements OnMapReadyCallback, Ac
             }
         });
 
-//        buildGoogleApiClient();
-
         if (locationService.checkPermissions()) {
             configLocationHandling();
         }
@@ -211,8 +199,8 @@ public class EpicMap extends AppCompatActivity implements OnMapReadyCallback, Ac
     }
 
     @Override
-    public Activity getImplementer() {
-        return this;
+    public Context getContext() {
+        return getApplicationContext();
     }
 
     public void doLocate(Location aLocation) {
@@ -373,40 +361,6 @@ public class EpicMap extends AppCompatActivity implements OnMapReadyCallback, Ac
     }
 
 
-//    private synchronized void buildGoogleApiClient() {
-//        googleApiClient = new GoogleApiClient.Builder(this)
-//                .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
-//                    @Override
-//                    public void onConnected(@Nullable Bundle bundle) {
-//                        createConnection(bundle);
-//                    }
-//
-//                    @Override
-//                    public void onConnectionSuspended(int i) {
-//                        System.out.print("AUTSCH");
-//                    }
-//                })
-//                .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
-//                    @Override
-//                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-//                        System.out.print("AUTSCH");
-//                    }
-//                })
-//                .addApi(LocationServices.API)
-//                .build();
-//
-//        googleApiClient.connect();
-//    }
-
-//
-//    private void createConnection(Bundle bundle) {
-//
-//        locationRequest = new LocationRequest();
-//        locationRequest.setInterval(10000);
-//        locationRequest.setFastestInterval(10000);
-//        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-//    }
-
 
     private void deleteMapMarker() {
         positionService.remove((Position) selectedMarker.getTag());
@@ -451,16 +405,5 @@ public class EpicMap extends AppCompatActivity implements OnMapReadyCallback, Ac
         intent.putExtra(Constants.PARAMETER.POSITION.name(), position);
         addNewMapMarker(intent);
     }
-//
-//    @Override
-//    protected void onPause() {
-//        super.onPause();
-//        Toast.makeText(this, "onPause: Pause EPIC", Toast.LENGTH_SHORT).show();
-//    }
-//
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//        Toast.makeText(this, "onResume: Reactivate EPIC", Toast.LENGTH_SHORT).show();
-//    }
+
 }

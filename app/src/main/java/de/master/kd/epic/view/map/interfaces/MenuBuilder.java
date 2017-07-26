@@ -18,12 +18,9 @@ public class MenuBuilder {
     private FloatingActionButton edit_item, route_item, snych_item, trash_item, share_item;
     private Animation showMenu, hideMenu;
     private MenuItemHandler handler;
-    private Activity activity;
-    // PopupMenu popupMenu;
 
     public MenuBuilder(MenuItemHandler handler) {
         this.handler = handler;
-        this.activity = handler.getImplementer();
         buildMenu();
     }
 
@@ -33,17 +30,10 @@ public class MenuBuilder {
         trash_item = getDeleteActionButton();
         share_item = getShareActionButton();
         route_item = getRouteActionButton();
-        snych_item = (FloatingActionButton) activity.findViewById(R.id.item_synch_task);
+        snych_item = (FloatingActionButton) ((Activity)handler).findViewById(R.id.item_synch_task);
 
-        showMenu = AnimationUtils.loadAnimation(activity.getApplicationContext(), R.anim.menu_open);
-        hideMenu = AnimationUtils.loadAnimation(activity.getApplicationContext(), R.anim.menu_close);
-
-//            popupMenu = new PopupMenu(EpicMap.this, layout);
-//            popupMenu.getMenu().add(1,R.id.item_edit_task,1,"Edit");
-//            popupMenu.getMenu().add(1,R.id.item_route_task,2,"slot2");
-//            popupMenu.getMenu().add(1,R.id.item_synch_task,3,"slot3");
-//            popupMenu.getMenu().add(1,R.id.item_delete_task,4,"slot34");
-
+        showMenu = AnimationUtils.loadAnimation(handler.getContext(), R.anim.menu_open);
+        hideMenu = AnimationUtils.loadAnimation(handler.getContext(), R.anim.menu_close);
     }
 
     public void toggleMenuVisibilty(boolean show) {
@@ -71,7 +61,7 @@ public class MenuBuilder {
     }
 
     private FloatingActionButton getEditActionButton() {
-        FloatingActionButton item = (FloatingActionButton) activity.findViewById(R.id.item_edit_task);
+        FloatingActionButton item = (FloatingActionButton)  ((Activity)handler).findViewById(R.id.item_edit_task);
         item.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -83,7 +73,7 @@ public class MenuBuilder {
     }
 
     private FloatingActionButton getDeleteActionButton() {
-        FloatingActionButton item = (FloatingActionButton) activity.findViewById(R.id.item_delete_task);
+        FloatingActionButton item = (FloatingActionButton)  ((Activity)handler).findViewById(R.id.item_delete_task);
         item.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -95,7 +85,7 @@ public class MenuBuilder {
     }
 
     private FloatingActionButton getShareActionButton() {
-        FloatingActionButton item = (FloatingActionButton) activity.findViewById(R.id.item_share_task);
+        FloatingActionButton item = (FloatingActionButton)  ((Activity)handler).findViewById(R.id.item_share_task);
         item.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -107,7 +97,7 @@ public class MenuBuilder {
     }
 
     private FloatingActionButton getRouteActionButton() {
-        FloatingActionButton item = (FloatingActionButton) activity.findViewById(R.id.item_route_task);
+        FloatingActionButton item = (FloatingActionButton)  ((Activity)handler).findViewById(R.id.item_route_task);
         item.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

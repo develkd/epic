@@ -1,4 +1,4 @@
-package de.master.kd.epic.view.map.receiver;
+package de.master.kd.epic.services;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -16,12 +16,12 @@ public class EpicMapReceiver extends BroadcastReceiver {
 
         if (intent.getAction().matches("android.location.PROVIDERS_CHANGED")) {
             if (!((LocationManager)context.getSystemService(Context.LOCATION_SERVICE)).isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                Toast.makeText(context, "Intent Detected. OFF",
-                        Toast.LENGTH_LONG).show();
-
+//                Toast.makeText(context, "Intent Detected. OFF",
+//                        Toast.LENGTH_LONG).show();
+//
             }else{
-                Toast.makeText(context, "Intent Detected. ON",
-                        Toast.LENGTH_LONG).show();
+//                Toast.makeText(context, "Intent Detected. ON",
+//                        Toast.LENGTH_LONG).show();
             }
 
         }
