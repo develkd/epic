@@ -44,6 +44,7 @@ import java.util.List;
 import de.master.kd.epic.R;
 import de.master.kd.epic.domain.interfaces.PositionService;
 import de.master.kd.epic.domain.position.Position;
+import de.master.kd.epic.services.LocationShareService;
 import de.master.kd.epic.view.map.interfaces.LocationHandler;
 import de.master.kd.epic.services.LocationService;
 import de.master.kd.epic.view.map.interfaces.MenuBuilder;
@@ -144,7 +145,7 @@ public class EpicMap extends AppCompatActivity implements OnMapReadyCallback, Ac
             }
         });
 
-        buildGoogleApiClient();
+//        buildGoogleApiClient();
 
         if (locationService.checkPermissions()) {
             configLocationHandling();
@@ -304,7 +305,6 @@ public class EpicMap extends AppCompatActivity implements OnMapReadyCallback, Ac
             Bitmap b = PictureService.loadImage(getApplicationContext(), path);
             if (null != b) {
                 view.setImageBitmap(b);
-                view.setRotation(90);
             }
         }
         return layout;
@@ -367,45 +367,45 @@ public class EpicMap extends AppCompatActivity implements OnMapReadyCallback, Ac
 
         selectedMarker.setTitle(p.getTitle());
         selectedMarker.setSnippet(StringUtils.cut(p.getDescription(), p.getTitle().length()));
-        selectedMarker.setIcon(BitmapDescriptorFactory.fromBitmap(PictureService.createBitmap(this, layout)));
+        selectedMarker.setIcon(addBitmaptToMarker(layout));
         location = selectedMarker.getPosition();
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(location));
     }
 
 
-    private synchronized void buildGoogleApiClient() {
-        googleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
-                    @Override
-                    public void onConnected(@Nullable Bundle bundle) {
-                        createConnection(bundle);
-                    }
+//    private synchronized void buildGoogleApiClient() {
+//        googleApiClient = new GoogleApiClient.Builder(this)
+//                .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+//                    @Override
+//                    public void onConnected(@Nullable Bundle bundle) {
+//                        createConnection(bundle);
+//                    }
+//
+//                    @Override
+//                    public void onConnectionSuspended(int i) {
+//                        System.out.print("AUTSCH");
+//                    }
+//                })
+//                .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+//                    @Override
+//                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+//                        System.out.print("AUTSCH");
+//                    }
+//                })
+//                .addApi(LocationServices.API)
+//                .build();
+//
+//        googleApiClient.connect();
+//    }
 
-                    @Override
-                    public void onConnectionSuspended(int i) {
-                        System.out.print("AUTSCH");
-                    }
-                })
-                .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                        System.out.print("AUTSCH");
-                    }
-                })
-                .addApi(LocationServices.API)
-                .build();
-
-        googleApiClient.connect();
-    }
-
-
-    private void createConnection(Bundle bundle) {
-
-        locationRequest = new LocationRequest();
-        locationRequest.setInterval(10000);
-        locationRequest.setFastestInterval(10000);
-        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-    }
+//
+//    private void createConnection(Bundle bundle) {
+//
+//        locationRequest = new LocationRequest();
+//        locationRequest.setInterval(10000);
+//        locationRequest.setFastestInterval(10000);
+//        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+//    }
 
 
     private void deleteMapMarker() {
@@ -425,63 +425,15 @@ public class EpicMap extends AppCompatActivity implements OnMapReadyCallback, Ac
 
     private void shareMapMarker() {
         LatLng latLng = selectedMarker.getPosition();
-
-        String uri = "https://maps.google.com/?q=" + latLng.latitude + "," + latLng.longitude;
-        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-        sharingIntent.setType("text/plain");
-        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, getGeoCodedAdressInfo(selectedMarker.getTitle(), latLng));
-        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, uri);
-        startActivity(Intent.createChooser(sharingIntent, "Share via"));
+        String title = selectedMarker.getTitle();
+        new LocationShareService(getApplicationContext()).sharePosition(latLng, title);
     }
 
 
-    private void doRoute(){
-        LatLng latLng = selectedMarker.getPosition();
-
-        Uri gmmIntentUri = Uri.parse("google.navigation:q="+ latLng.latitude + "," + latLng.longitude);
-        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-        mapIntent.setPackage("com.google.android.apps.maps");
-        startActivity(mapIntent);
-
+   private void doRoute(){
+       LatLng latLng = selectedMarker.getPosition();
+       new LocationShareService(getApplicationContext()).doRoute(latLng);
     }
-
-
-    private String getGeoCodedAdressInfo(String title, LatLng latLng) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(title).append(": \n");
-        Address address = getAdress(latLng);
-        if (null == address) {
-            return "Keine Adresse vorhanden";
-        }
-
-        for (int i = 0; i < address.getMaxAddressLineIndex(); i++) {
-            builder.append(address.getAddressLine(i)).append("\n");
-        }
-        String area = address.getAdminArea();
-        if (!StringUtils.isEmpty(area)) {
-            builder.append(area).append("\n");
-        }
-        return builder.toString();
-
-    }
-
-
-    private Address getAdress(LatLng latLng) {
-        Geocoder geocoder = new Geocoder(getApplicationContext());
-        List<Address> adds = null;
-        try {
-            adds = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        if (null == adds || adds.isEmpty()) {
-            return null;
-        }
-
-        return adds.get(0);
-    }
-
 
     private void createMarkerForIncomingGeoData(Intent intent) {
         String geoCode = locationService.extractGeoCodeFromQuery(intent.getData());
@@ -499,17 +451,16 @@ public class EpicMap extends AppCompatActivity implements OnMapReadyCallback, Ac
         intent.putExtra(Constants.PARAMETER.POSITION.name(), position);
         addNewMapMarker(intent);
     }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Toast.makeText(this, "onPause", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        Toast.makeText(this, "onResume", Toast.LENGTH_SHORT).show();
-    }
+//
+//    @Override
+//    protected void onPause() {
+//        super.onPause();
+//        Toast.makeText(this, "onPause: Pause EPIC", Toast.LENGTH_SHORT).show();
+//    }
+//
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        Toast.makeText(this, "onResume: Reactivate EPIC", Toast.LENGTH_SHORT).show();
+//    }
 }
